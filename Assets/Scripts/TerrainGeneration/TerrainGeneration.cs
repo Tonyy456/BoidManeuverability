@@ -6,6 +6,7 @@ using UnityEngine;
 public class TerrainGeneration : MonoBehaviour
 {
     [SerializeField] private bool regenerate = false;
+    [SerializeField] private GenerationType gentype;
 
     [Header("GEOMETRY")]
     [SerializeField] private int verticesWide = 10;
@@ -16,7 +17,6 @@ public class TerrainGeneration : MonoBehaviour
     [Header("NOISE")]
     [SerializeField] private float frequency = 0.01f;
     [SerializeField] private float seed = 0f;
-    public Texture2D texture;
 
     public void Start()
     {
@@ -34,7 +34,7 @@ public class TerrainGeneration : MonoBehaviour
     {
         MeshGenerator generator = new MeshGenerator(verticesWide, verticesLong, vertexSeperation, new Vector3(0, 0, 0));
         TerrainHeightGenerator terrain = new TerrainHeightGenerator(generator.GetMesh(), heightScalar, frequency);
-        terrain.GenerateHeight(GenerationType.XSquared);
+        terrain.GenerateHeight(gentype);
         GetComponent<MeshFilter>().mesh = terrain.GetMesh();
     }
 }

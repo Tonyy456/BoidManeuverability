@@ -74,8 +74,8 @@ public class TerrainHeightGenerator
         for(int i = 0; i < mesh.vertexCount; i++)
         {
             Vector3 position = vertices[i];
-            float perlin = GetPerlinValueAt(position.x, position.y);
-            float newHeight = perlin * perlin * heightScalar;
+            float perlin = GetPerlinValueAt(position.x, position.z);
+            float newHeight = perlin * perlin *  heightScalar;
             vertices[i].y = newHeight;
         }
         mesh.vertices = vertices;
@@ -83,13 +83,15 @@ public class TerrainHeightGenerator
 
     private void GenerateUsingInverseX()
     {
+        Vector3[] vertices = mesh.vertices;
         for (int i = 0; i < mesh.vertexCount; i++)
         {
-            Vector3 position = mesh.vertices[i];
-            float perlin = GetPerlinValueAt(position.x, position.y);
-            float newHeight = heightScalar / perlin;
-            mesh.vertices[i].y = newHeight;
+            Vector3 position = vertices[i];
+            float perlin = GetPerlinValueAt(position.x, position.z);
+            float newHeight = heightScalar/perlin;
+            vertices[i].y = newHeight;
         }
+        mesh.vertices = vertices;
     }
 
     private void GreenBrownColoring()
@@ -116,6 +118,7 @@ public class TerrainHeightGenerator
 
     private float GetPerlinValueAt(float x, float y)
     {
-        return Mathf.PerlinNoise((x * frequency), (y * frequency));
+        float returnv =  Mathf.Clamp(Mathf.PerlinNoise(((x + 10000f) * frequency), ((y + 10000f) * frequency)), 0.01f ,1f);
+        return returnv;
     }
 }
