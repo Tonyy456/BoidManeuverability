@@ -13,6 +13,7 @@ public class TerrainGeneration : MonoBehaviour
     [SerializeField] private int verticesLong = 10;
     [SerializeField] private float vertexSeperation = 10f;
     [SerializeField] private float heightScalar = 100f;
+    [SerializeField] private Gradient gradient;
 
     [Header("NOISE")]
     [SerializeField] private float frequency = 0.01f;
@@ -33,8 +34,9 @@ public class TerrainGeneration : MonoBehaviour
     private void GenerateMesh()
     {
         MeshGenerator generator = new MeshGenerator(verticesWide, verticesLong, vertexSeperation, new Vector3(0, 0, 0));
-        TerrainHeightGenerator terrain = new TerrainHeightGenerator(generator.GetMesh(), heightScalar, frequency);
+        TerrainHeightGenerator terrain = new TerrainHeightGenerator(generator.GetMesh(), heightScalar, frequency, this.seed);
         terrain.GenerateHeight(gentype);
+        terrain.ColorTerrain(TerrainColoringType.BrownToGreen, gradient);
         GetComponent<MeshFilter>().mesh = terrain.GetMesh();
     }
 }

@@ -51,21 +51,24 @@ public class TerrainHeightGenerator
         UpdateMesh();
     }
 
-    public void ColorTerrain(TerrainColoringType type)
+    public void ColorTerrain(TerrainColoringType type, Gradient gradient)
     {
         switch (type)
         {
             case TerrainColoringType.BrownToGreen:
-
+                GreenBrownColoring(gradient);
                 break;
             default:
                 break;
         }
+        UpdateMesh();
     }
 
     private void UpdateMesh()
     {
         mesh.RecalculateNormals();
+        //mesh.RecalculateUVDistributionMetric();
+        mesh.RecalculateUVDistributionMetrics();
     }
 
     private void GenerateUsingXSquared()
@@ -94,31 +97,36 @@ public class TerrainHeightGenerator
         mesh.vertices = vertices;
     }
 
-    private void GreenBrownColoring()
+    private void GreenBrownColoring(Gradient gradient)
     {
-        float maxHeight = float.MaxValue;
-        float minValue = float.MinValue;
+        float maxHeight = float.MinValue;
+        float minValue = float.MaxValue;
         for (int i = 0; i < mesh.vertexCount; i++)
         {
-            if (mesh.vertices[i].y < maxHeight)
+            if (mesh.vertices[i].y > maxHeight)
             {
                 maxHeight = mesh.vertices[i].y;
             }
-            if (mesh.vertices[i].y > minValue)
+            if (mesh.vertices[i].y < minValue)
             {
                 minValue = mesh.vertices[i].y;
             }
         }
 
+        List<Color> colors = new List<Color>();
         for(int i = 0; i < mesh.vertexCount; i++)
         {
-            //color
+            float time = (maxHeight - mesh.vertices[i].y) / (maxHeight - minValue);
+            Color c = gradient.Evaluate(time);
+            colors.Add(c);
         }
+        //mesh.SetColors(colors);
+        mesh.colors = colors.ToArray();
     }
 
     private float GetPerlinValueAt(float x, float y)
     {
-        float returnv =  Mathf.Clamp(Mathf.PerlinNoise(((x + 10000f) * frequency), ((y + 10000f) * frequency)), 0.01f ,1f);
+        float returnv =  Mathf.Clamp(Mathf.PerlinNoise(((x + 10000f + seed) * frequency), ((y + 10000f + seed) * frequency)), 0.01f ,1f);
         return returnv;
     }
 }
