@@ -51,23 +51,15 @@ public class TerrainHeightGenerator
         UpdateMesh();
     }
 
-    public void ColorTerrain(TerrainColoringType type, Gradient gradient)
+    public void ColorTerrain(Gradient gradient)
     {
-        switch (type)
-        {
-            case TerrainColoringType.BrownToGreen:
-                GreenBrownColoring(gradient);
-                break;
-            default:
-                break;
-        }
+        GreenBrownColoring(gradient);
         UpdateMesh();
     }
 
     private void UpdateMesh()
     {
         mesh.RecalculateNormals();
-        //mesh.RecalculateUVDistributionMetric();
         mesh.RecalculateUVDistributionMetrics();
     }
 
@@ -91,6 +83,7 @@ public class TerrainHeightGenerator
         {
             Vector3 position = vertices[i];
             float perlin = GetPerlinValueAt(position.x, position.z);
+            perlin = Mathf.Clamp(perlin, 0.01f, 1f);
             float newHeight = heightScalar/perlin;
             vertices[i].y = newHeight;
         }
