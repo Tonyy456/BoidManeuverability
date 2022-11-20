@@ -2,8 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Algorithm
+namespace TerrainGeneration.Version3
 {
-    MachingCubes,
-    HeightMapper
+    public enum Algorithm
+    {
+        MachingCubes,
+        HeightMapper
+    }
 }
