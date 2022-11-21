@@ -39,17 +39,6 @@ namespace TerrainGeneration.Version3
             return Mathf.Sin(Mathf.PI * Mathf.PerlinNoise(a * _settings.frequency, b * _settings.frequency));
         }
 
-        /*
-         * values go:
-         * 111,
-         * 11-1,
-         * 1-11,
-         * -111,
-         * -11-1,
-         * 1-1-1,
-         * -1-1-1,
-         * -1-11
-         */
         public Mesh GenerateForSingleSquare(Dictionary<Vector3, float> pointToNoise)
         {
             return null;
