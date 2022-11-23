@@ -15,77 +15,31 @@ public class customButton2 : Editor
         SingleCubeTest myScript = (SingleCubeTest)target;
         if (GUILayout.Button("Load"))
         {
-            myScript.Reload();
+            myScript.Load();
         }
     }
 }
 public class SingleCubeTest : MonoBehaviour
 {
-    [SerializeField] private MeshFilter filter;
-    [SerializeField] private float frequency;
-    private MarchingCubes cubes;
+    [Header("CUBE SETTINGS")]
+    [SerializeField] private Vector3 position;
+    [SerializeField] private Vector3Int dimensions;
+    [SerializeField] private float seperation;
+    [SerializeField] private MeshFilter meshFilter;
+
+    [Header("NOISE SETTINGS")]
+    [SerializeField] private float frequency = 0.05f;
+    [SerializeField] private float surface = 0.5f;
+
     public void Start()
     {
-        cubes = new MarchingCubes(new Vector3(), 6, 2);
-        cubes.March(filter, frequency);
-        cubes.ShowVertices();
+        Load();  
     }
 
-    public void Reload()
+    public void Load()
     {
-        cubes.MassiveMarch(filter);
+        MarchingCubes mc = new MarchingCubes(position, dimensions, seperation);
+        mc.March(meshFilter, frequency, surface);
+        //mc.DisplayVertices(1f);
     }
-    /*
-    [SerializeField] private GenerationSettings settings;
-    [SerializeField] private Transform parent;
-    [SerializeField] private GameObject prefab;
-    [SerializeField] private MeshFilter filter;
-
-    TriangulationCube cube;
-    List<AVertex> vertices = new List<AVertex>();
-    public void Start()
-    {
-        TestCube();
-    }
-
-    public void Update()
-    {
-        int[] ons = new int[8];
-        foreach (var v in vertices)
-        {
-            ons[v.index] = v.IsOn;
-        }
-        cube.SetVertices(ons);
-        if(cube.needsUpdated)
-        {
-            filter.mesh = cube.CreateMesh();
-        }
-    }
-    public void TestCube()
-    {
-        cube = new TriangulationCube(new Vector3(0,0,0), 4f);
-
-        int[] isOns = new int[8];
-        for(int i = 0; i < 8; i++)
-        {
-            Vector3 location = cube.getVertexLocation(i);
-            GameObject go =  createVertex(i, location, 0);
-            isOns[i] = go.GetComponent<AVertex>().IsOn;
-        }
-        cube.SetVertices(isOns);
-
-        filter.mesh = cube.CreateMesh();
-    }
-
-    public GameObject createVertex(int index, Vector3 position, int vertexValue)
-    {
-        GameObject go = Instantiate(prefab);
-        go.transform.position = position;
-        go.transform.parent = this.parent;
-        var ver = go.GetComponent<AVertex>();
-        this.vertices.Add(ver);
-        ver.index = index;
-        return go;
-    }
-    */
 }

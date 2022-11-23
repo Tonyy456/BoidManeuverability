@@ -88,8 +88,28 @@ public class MCCube
 
         if (!errorFound) return;
 
-        foreach (string var in errorMessages)
-            Debug.Log(var);
+        //foreach (string var in errorMessages)
+            //Debug.Log(var);
         //throw new System.Exception("Not a valid cube definition");
+    }
+
+    public void DispVertices()
+    {
+        foreach(Vertex v in vertices)
+        {
+            if(v.IsOn)
+                PlaceCircle(v.Position, Color.white, "vOn");
+            else
+                PlaceCircle(v.Position, Color.black, "vOff");
+        }
+    }
+
+    private GameObject PlaceCircle(Vector3 position, Color c, string name)
+    {
+        GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        go.name = name;
+        go.GetComponent<MeshRenderer>().material.color = c;
+        go.transform.position = position;
+        return go;
     }
 }

@@ -41,8 +41,8 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
-  distance: 20
+  distance: 100
   resolution: 5
-  frequency: 0.05
+  frequency: 0.01
   maxHeight: 100
   seed: 10000
