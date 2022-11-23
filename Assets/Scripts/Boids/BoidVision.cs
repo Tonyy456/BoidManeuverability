@@ -64,9 +64,13 @@ public class BoidVision
             if (Physics.Raycast(center, facing, out hit, distance))
             {
                 hits.Add(hit);
+                Debug.Log("HIT SOMETHING!!!");
                 Transform transform = hit.transform;
-                if (transform.gameObject.GetComponent<Boid>() != null)
+                if (transform.gameObject.GetComponent<Boid>() != null) {
+                    Debug.Log("BOID DETECTED!!!");
                     boids.Add(transform);
+                }
+                    
             }
             else
             {
