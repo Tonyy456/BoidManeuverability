@@ -2,9 +2,40 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TerrainGeneration.Version3;
+using UnityEditor;
 
+
+[CustomEditor(typeof(SingleCubeTest))]
+public class customButton2 : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+
+        SingleCubeTest myScript = (SingleCubeTest)target;
+        if (GUILayout.Button("Load"))
+        {
+            myScript.Reload();
+        }
+    }
+}
 public class SingleCubeTest : MonoBehaviour
 {
+    [SerializeField] private MeshFilter filter;
+    [SerializeField] private float frequency;
+    private MarchingCubes cubes;
+    public void Start()
+    {
+        cubes = new MarchingCubes(new Vector3(), 6, 2);
+        cubes.March(filter, frequency);
+        cubes.ShowVertices();
+    }
+
+    public void Reload()
+    {
+        cubes.MassiveMarch(filter);
+    }
+    /*
     [SerializeField] private GenerationSettings settings;
     [SerializeField] private Transform parent;
     [SerializeField] private GameObject prefab;
@@ -56,4 +87,5 @@ public class SingleCubeTest : MonoBehaviour
         ver.index = index;
         return go;
     }
+    */
 }

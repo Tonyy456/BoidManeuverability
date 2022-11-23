@@ -266,7 +266,7 @@ public class TriangulationTable : MonoBehaviour
     0x0
 };
 
-    public static readonly int[,] triangulation = new int[256,16]{
+    public static readonly int[,] triangulation = new int[256, 16]{
     {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
     { 0, 8, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
     { 0, 1, 9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
@@ -525,33 +525,33 @@ public class TriangulationTable : MonoBehaviour
     {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }
     };
 
-public static readonly int[] cornerIndexAFromEdge = new int[12]{
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    0,
-    1,
-    2,
-    3
-};
+    public static readonly Vector3[] VertexToRPosition = new Vector3[8]
+    {
+        new Vector3(-0.5f, -0.5f, 0.5f),
+        new Vector3(0.5f, -0.5f, 0.5f),
+        new Vector3(0.5f, -0.5f, -0.5f),
+        new Vector3(-0.5f, -0.5f, -0.5f),
+        new Vector3(-0.5f, 0.5f, 0.5f),
+        new Vector3(0.5f, 0.5f, 0.5f),
+        new Vector3(0.5f, 0.5f, -0.5f),
+        new Vector3(-0.5f, 0.5f, -0.5f),
+    };
 
-   public static readonly int[] cornerIndexBFromEdge = new int[12]{
-    1,
-    2,
-    3,
-    0,
-    5,
-    6,
-    7,
-    4,
-    4,
-    5,
-    6,
-    7
-};
+    public static readonly Vector3[] EdgeToPosition = new Vector3[12]
+    {
+        new Vector3(0, -0.5f, -0.5f),
+        new Vector3(0.5f, -0.5f, 0),
+        new Vector3(0, -0.5f, 0.5f),
+        new Vector3(-0.5f, -0.5f, 0),
+
+        new Vector3(0, 0.5f, -0.5f),
+        new Vector3(0.5f, 0.5f, 0),
+        new Vector3(0, 0.5f, 0.5f),
+        new Vector3(-0.5f, 0.5f, 0),
+
+        new Vector3(-0.5f, 0, -0.5f),
+        new Vector3(0.5f, 0, -0.5f),
+        new Vector3(0.5f, 0, 0.5f),
+        new Vector3(-0.5f, 0, 0.5f)
+    };
 }
