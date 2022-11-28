@@ -6,9 +6,10 @@ namespace TerrainGeneration.Version3
 {
     public class TerrainGenerator : MonoBehaviour
     {
-        [SerializeField] private GenerationSettings settings;
         [SerializeField] private MeshFilter meshObject;
         [SerializeField] private Algorithm generationType = Algorithm.HeightMapper;
+        [SerializeField] private GenerationSettings HeightMapSettings;
+        [SerializeField] private GenerationSettings CubeSettings;
 
         private ITerrainAlgorithm algorithm;
 
@@ -16,11 +17,15 @@ namespace TerrainGeneration.Version3
         {
             switch (generationType)
             {
-                default:
-                    algorithm = new HeightMapper(settings, meshObject);
+                case Algorithm.HeightMapper:
+                    algorithm = new HeightMapper(HeightMapSettings, meshObject);
                     break;
+                case Algorithm.MachingCubes:
+                    algorithm = new MCGeneration(CubeSettings, meshObject);
+                    break;
+                
             }
-            algorithm.Generate(new Vector3(0, 0, 0));
+            algorithm.Generate(new Vector3());
         }
     }
 }

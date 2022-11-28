@@ -41,8 +41,10 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
-  distance: 1000
-  resolution: 50
-  frequency: 0.005
-  maxHeight: 500
+  center: {x: 0, y: 0, z: 0}
+  resolution: {x: 40, y: 40, z: 40}
+  pointSeperation: 40
+  frequency: 0.003
+  surface: 0.5
+  maxHeight: 650
   seed: 1000

@@ -22,14 +22,12 @@ namespace TerrainGeneration.Version3
              */
             List<Vector3> meshPoints = new List<Vector3>();
             List<Color> vertexColors = new List<Color>();
-            Vector2 start = new Vector2(position.x - _settings.distance/2, position.z - _settings.distance/2);
-            float pointSeperation = _settings.distance / _settings.resolution;
-
-            for(int x = 0; x < _settings.resolution; x++)
+            Vector2 start = new Vector2(position.x - _settings.resolution.x * _settings.pointSeperation/2, position.z - _settings.resolution.z * _settings.pointSeperation / 2);
+            for(int x = 0; x < _settings.resolution.x; x++)
             {
-                for(int y = 0; y < _settings.resolution; y++)
+                for(int y = 0; y < _settings.resolution.y; y++)
                 {
-                    Vector2 xyPos = new Vector2(start.x + pointSeperation * x, start.y + pointSeperation * y);
+                    Vector2 xyPos = new Vector2(start.x + _settings.pointSeperation * x, start.y + _settings.pointSeperation * y);
                     Vector3 pos = GeneratePoint(xyPos);
                     Color c = _settings.HeightColorGradient.Evaluate(pos.y);
                     meshPoints.Add(pos);
@@ -42,10 +40,10 @@ namespace TerrainGeneration.Version3
              * len(indices) == ((resolution - 1) ^ 2) * 6
              */
             List<int> indices = new List<int>();
-            int width = _settings.resolution;
-            for(int x = 0; x < _settings.resolution - 1; x++)
+            int width = _settings.resolution.x;
+            for(int x = 0; x < _settings.resolution.x - 1; x++)
             {
-                for(int y = 0; y< _settings.resolution - 1; y++)
+                for(int y = 0; y< _settings.resolution.x - 1; y++)
                 {
                     int vertex = x + width * y;
                     indices.Add(vertex + width + 1);
@@ -74,7 +72,7 @@ namespace TerrainGeneration.Version3
 
         public float Perlin(float posx, float posy)
         {
-            float perlin = Mathf.PerlinNoise((posx + _settings.seed + _settings.distance) * _settings.frequency, (posy + _settings.seed + _settings.distance) * _settings.frequency);
+            float perlin = Mathf.PerlinNoise((posx + _settings.seed) * _settings.frequency, (posy + _settings.seed) * _settings.frequency);
             return perlin;
         }
     }

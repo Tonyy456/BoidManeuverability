@@ -345,9 +345,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cad28df6ba9a43d282ef759e9e938fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  settings: {fileID: 11400000, guid: 06a45e5a8efb8b24da0a8dcc458cd444, type: 2}
   meshObject: {fileID: 2105770222}
-  generationType: 1
+  generationType: 0
+  HeightMapSettings: {fileID: 11400000, guid: 06a45e5a8efb8b24da0a8dcc458cd444, type: 2}
+  CubeSettings: {fileID: 11400000, guid: b338b7e71eb4a4f43a8d61b42ce159c3, type: 2}
 --- !u!1 &2105770220
 GameObject:
   m_ObjectHideFlags: 0
