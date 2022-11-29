@@ -1,67 +1,100 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
+using TerrainGeneration.Version3;
+using UnityEngine.Jobs;
+using Unity.Collections;
+using Unity.Jobs;
 
-public class MarchingCubes
+public class MarchingCubes : ITerrainAlgorithm
 {
-    private Vector3 center;
-    private Vector3Int dimensions;
-    private float seperation;
+    private MeshFilter filter;
+    private MCCubes cubes;
+    private Mesh mesh;
+    private GenerationSettings settings;
 
-    MCCube[,,] cubes;
-    public int[] Triangles
+    public TMPro.TMP_Text text { get; set; }
+    public MarchingCubes(MeshFilter filter)
     {
-        get
+        this.filter = filter;
+    }
+
+    public void Generate(Vector3 position, GenerationSettings settings)
+    {
+        this.settings = settings;
+        March(settings);
+    }
+
+    private float freq = 0.05f;
+    private float surface = 0.5f;
+    public void March(GenerationSettings settings)
+    {
+        freq = settings.frequency;
+        surface = settings.surface;
+        cubes = new MCCubes(settings.center, settings.resolution, settings.pointSeperation);
+        GridGraph graph = cubes.graph;
+
+        mesh = new Mesh();
+        mesh.vertices = graph.getMeshVertices();
+        cubes.graph.DrawBounds(1000000f, Color.gray);    }
+
+    public IEnumerator StartMarches()
+    {
+        filter.mesh = mesh;
+
+        List<Vertex> vertices = cubes.graph.getVertices();
+        float totalIterations = vertices.Count + cubes.CubeCount + mesh.vertexCount;
+        float currentIteration = 0;
+        /*
+         * Set vertices on/off based on noise
+         */
+        foreach(Vertex v in vertices)
         {
-            List<int> triangles = new List<int>();
-            foreach (var cube in cubes)
-            {
-                foreach (int item in cube.getTriangles())
-                    triangles.Add(item);
-            }
-            return triangles.ToArray();
+            float value = PerlinNoise.get3DPerlinNoise(v.Position, freq);
+            if (value < surface)
+                v.IsOn = true;
+            currentIteration += 1;
+            text.text = $"loading: {currentIteration / totalIterations * 100f}%";
+            if (totalIterations % 30 == 0)
+                yield return new WaitForEndOfFrame();
         }
-    }
+        vertices = null;
+        yield return new WaitForSeconds(0.1f);
 
-    public GridGraph graph { get; set; }
-
-    public MarchingCubes(Vector3 center, Vector3Int dimensions, float seperation)
-    {
-        this.center = center;
-        this.dimensions = dimensions;
-        this.seperation = seperation;
-        graph = new GridGraph(center, dimensions, seperation);
-        cubes = new MCCube[dimensions.x - 1, dimensions.y - 1, dimensions.z - 1];
-        CreateCubes();
-    }
-
-    public void DrawBounds()
-    {
-
-    }
-
-    private void CreateCubes()
-    {
-        for(int i = 0; i < dimensions.x - 1; i++)
+        /*
+         * grab triangles from cubes and assign to mesh
+         */
+        List<int> triangles = new List<int>();
+        for (int i = 0; i < cubes.CubeCount; i++)
         {
-            for(int j = 0; j < dimensions.y - 1; j++)
-            {
-                for(int k = 0; k < dimensions.z - 1; k++)
-                {
-                    MCCube cube = new MCCube(graph.getVerticesForCube(i, j, k), graph.getEdgesForCube(i, j, k));
-                    cubes[i, j, k] = cube;
-                }
-            }
+            List<int> newTs = cubes.March(i);
+            foreach (int item in newTs)
+                triangles.Add(item);
+            mesh.triangles = triangles.ToArray();
+
+            currentIteration += 1;
+            text.text = $"loading: {currentIteration / totalIterations * 100f}%";
+            if (totalIterations % 30 == 0)
+                yield return new WaitForEndOfFrame();
         }
-    }
+        mesh.RecalculateNormals();
 
-    public void March()
-    {
-        foreach(MCCube cube in cubes)
+        /*
+         * Color terrain
+         */
+        Color[] colors = new Color[mesh.vertexCount];
+        for(int i = 0; i < mesh.vertexCount; i++)
         {
-            cube.March();
-        }       
+            float angle = Vector3.Angle(new Vector3(0, 1, 0), mesh.normals[i]);
+            colors[i] = settings.HeightColorGradient.Evaluate(angle / 180f);
+
+            currentIteration += 1;
+            text.text = $"loading: {currentIteration / totalIterations * 100f}%";
+            if (totalIterations % 30 == 0)
+                yield return new WaitForEndOfFrame();
+        }
+        mesh.SetColors(colors);
+        mesh.Optimize();
+        filter.mesh = mesh;
     }
 }

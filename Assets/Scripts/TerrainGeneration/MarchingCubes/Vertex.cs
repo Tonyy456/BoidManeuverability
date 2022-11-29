@@ -4,9 +4,8 @@ using UnityEngine;
 
 public class Vertex
 {
-    public bool IsOn { get; set; }
-    public Vector3 Position { get; set; }
-
+    public bool IsOn;
+    public Vector3 Position;
     public Vertex(Vector3 position, bool isOn)
     {
         Position = position;

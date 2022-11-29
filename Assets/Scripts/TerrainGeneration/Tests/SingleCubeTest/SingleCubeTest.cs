@@ -29,10 +29,10 @@ public class SingleCubeTest : MonoBehaviour
     [SerializeField] private MeshFilter meshFilter;
     [SerializeField] private GameObject vertex;
 
-    MarchingCubes mc;
+    MCCubes mc;
     public void Start()
     {
-        mc = new MarchingCubes(position, dimensions, seperation);
+        mc = new MCCubes(position, dimensions, seperation);
         GameObject parent = new GameObject("vertices");
         foreach (Vertex v in mc.graph.getVertices())
         {

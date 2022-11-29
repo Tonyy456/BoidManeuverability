@@ -42,11 +42,11 @@ public class MCCube
         for (int i = 0; TriangulationTable.triangulation[cubeIdx, i] != -1; i += 3)
         {
             Edge idx1 = edges[TriangulationTable.triangulation[cubeIdx, i]];
-            triangles.Add(idx1.MeshIndex);
+            triangles.Add(idx1.Index);
             Edge idx2 = edges[TriangulationTable.triangulation[cubeIdx, i + 1]];
-            triangles.Add(idx2.MeshIndex);
+            triangles.Add(idx2.Index);
             Edge idx3 = edges[TriangulationTable.triangulation[cubeIdx, i + 2]];
-            triangles.Add(idx3.MeshIndex);
+            triangles.Add(idx3.Index);
         }
     }
 
@@ -78,9 +78,9 @@ public class MCCube
 
         for (int i = 0; i < 12; i++)
         {
-            if (!IsSimilar(edges[i].position - center, TriangulationTable.EdgeToPosition[i]))
+            if (!IsSimilar(edges[i].Position - center, TriangulationTable.EdgeToPosition[i]))
             {
-                errorMessages.Add($"edge {i} not in position: {edges[i].position - center}, should be {TriangulationTable.EdgeToPosition[i]}");
+                errorMessages.Add($"edge {i} not in position: {edges[i].Position - center}, should be {TriangulationTable.EdgeToPosition[i]}");
                 errorFound = true;
             }
         }

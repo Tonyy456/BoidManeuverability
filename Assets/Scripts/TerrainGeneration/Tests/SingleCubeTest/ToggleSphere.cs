@@ -44,10 +44,9 @@ public class ToggleSphere : MonoBehaviour
             this.GetComponent<MeshRenderer>().material.color = onColor;
         else
             this.GetComponent<MeshRenderer>().material.color = offColor;
-        if(v != null)
-        {
+        if (v != null)
             v.IsOn = isOn;
+        if(testScript != null)
             testScript.Load();
-        }
     }
 }

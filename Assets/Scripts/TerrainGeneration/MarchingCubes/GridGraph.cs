@@ -187,9 +187,9 @@ public class GridGraph
     public Vector3[] getMeshVertices()
     {
         Vector3[] vs = new Vector3[Xparallel.Length + Yparallel.Length + Zparallel.Length];
-        foreach (Edge e in Xparallel) vs[e.MeshIndex] = e.position;
-        foreach (Edge e in Yparallel) vs[e.MeshIndex] = e.position;
-        foreach (Edge e in Zparallel) vs[e.MeshIndex] = e.position;
+        foreach (Edge e in Xparallel) vs[e.Index] = e.Position;
+        foreach (Edge e in Yparallel) vs[e.Index] = e.Position;
+        foreach (Edge e in Zparallel) vs[e.Index] = e.Position;
         return vs;
     }
     public Edge[] getEdgesForCube(int x, int y, int z)
