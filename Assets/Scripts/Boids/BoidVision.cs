@@ -57,17 +57,15 @@ public class BoidVision
             Vector3 rayDirection = rayEnd - center;
 
             rays.Add(rayDirection);
-            if (Vector3.Angle(rayDirection, facing) > angle) continue;
+            if (Vector3.Angle(rayDirection, rayDirection) > angle) continue;
 
             RaycastHit hit;
             // Does the ray intersect any objects excluding the player layer
-            if (Physics.Raycast(center, facing, out hit, distance))
+            if (Physics.Raycast(center, rayDirection, out hit, distance))
             {
                 hits.Add(hit);
-                Debug.Log("HIT SOMETHING!!!");
                 Transform transform = hit.transform;
                 if (transform.gameObject.GetComponent<Boid>() != null) {
-                    Debug.Log("BOID DETECTED!!!");
                     boids.Add(transform);
                 }
                     

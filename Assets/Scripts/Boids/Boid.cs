@@ -8,7 +8,7 @@ public class Boid : MonoBehaviour
     public List<Transform> closeBoids;
     public List<Vector3> openPaths;
     public List<RaycastHit> obstructedPaths;
-    public Rigidbody thisBoid;
+    //public Rigidbody thisBoid;
 
     [Header("Individual Specs")]
     public Vector3 turnTowards;
@@ -18,7 +18,7 @@ public class Boid : MonoBehaviour
     public float distance = 5f;
 
     public void Start() {
-        thisBoid = GetComponent<Rigidbody>();
+        //thisBoid = GetComponent<Rigidbody>();
     }
 
     private void Update() {
@@ -38,7 +38,8 @@ public class Boid : MonoBehaviour
 
         //Positions
         BoundPosition();
-        thisBoid.velocity = transform.forward * speed;
+        //hisBoid.velocity = transform.forward * speed;
+        this.transform.position += this.transform.forward.normalized * speed * Time.deltaTime;
     }
 
     private Vector3 Avoid() {
