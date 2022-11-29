@@ -8,7 +8,6 @@ public class Boid : MonoBehaviour
     public List<Transform> closeBoids;
     public List<Vector3> openPaths;
     public List<RaycastHit> obstructedPaths;
-    //public Rigidbody thisBoid;
 
     [Header("Individual Specs")]
     public Vector3 turnTowards;
@@ -16,10 +15,6 @@ public class Boid : MonoBehaviour
     public float rotSpeed = 15f;
     public int resolution = 375;
     public float distance = 5f;
-
-    public void Start() {
-        //thisBoid = GetComponent<Rigidbody>();
-    }
 
     private void Update() {
         var bv = new BoidVision(transform.position, transform.forward, 360);
@@ -32,24 +27,55 @@ public class Boid : MonoBehaviour
 
         //Rotations
         if (closeBoids.Count > 0) {
-            turnTowards = Avoid();
+            turnTowards = Avoid() + Align() + Cohesion();
             transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(turnTowards), rotSpeed * Time.deltaTime);
         }
 
         //Positions
         BoundPosition();
-        //hisBoid.velocity = transform.forward * speed;
-        this.transform.position += this.transform.forward.normalized * speed * Time.deltaTime;
+        transform.position += transform.forward.normalized * speed * Time.deltaTime;
     }
 
     private Vector3 Avoid() {
         Vector3 turnDir = new Vector3();
 
         foreach (Transform x in closeBoids) {
-            turnDir += transform.position - x.transform.position;
+            if (Vector3.Distance(transform.position, x.transform.position) < 4f) {
+                turnDir += transform.position - x.transform.position;
+            }
         }
 
-        turnDir = turnDir.normalized;
+        turnDir.Normalize();
+        Debug.DrawRay(transform.position, turnDir * 5f, Color.green);
+
+        return turnDir;
+    }
+
+    private Vector3 Align() {
+        Vector3 turnDir = new Vector3();
+
+        foreach (Transform x in closeBoids) {
+            turnDir += x.transform.forward;
+        }
+
+        turnDir /= closeBoids.Count;
+        Debug.DrawRay(transform.position, turnDir * 5f, Color.red);
+
+        return turnDir;
+    }
+
+    private Vector3 Cohesion() {
+        Vector3 turnDir = new Vector3();
+        Vector3 avgPos = new Vector3();
+
+        foreach (Transform x in closeBoids) {
+            avgPos += x.transform.position;
+        }
+        avgPos /= closeBoids.Count;
+
+        turnDir = avgPos - transform.position;
+        turnDir.Normalize();
+        Debug.DrawRay(transform.position, turnDir * 5f, Color.blue);
 
         return turnDir;
     }

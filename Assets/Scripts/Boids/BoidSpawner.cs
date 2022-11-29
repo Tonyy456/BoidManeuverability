@@ -6,13 +6,14 @@ public class BoidSpawner : MonoBehaviour
 {
     public List<Vector3> spawnPoints;
     [SerializeField] GameObject boid;
+    public int boidNum;
 
     // Start is called before the first frame update
     void Start()
     {
-        foreach (Vector3 sp in spawnPoints) {
+        for (int i = 0; i < boidNum; i++) {
             GameObject one = Instantiate(boid);
-            one.transform.position = sp;
+            one.transform.position = spawnPoints[i % spawnPoints.Count];
         }
     }
 }

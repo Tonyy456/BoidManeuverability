@@ -67,14 +67,12 @@ public class BoidVision
                 Transform transform = hit.transform;
                 if (transform.gameObject.GetComponent<Boid>() != null) {
                     boids.Add(transform);
-                }
-                    
+                } 
             }
             else
             {
                 missedRays.Add(rayDirection);
             }
-
         }
     }
 
@@ -87,7 +85,7 @@ public class BoidVision
     {
         foreach(Vector3 rayDirection in rays)
         {
-            Debug.DrawRay(center, rayDirection, Vector3.Angle(facing, rayDirection) < angle ? Color.green : Color.red);
+            //Debug.DrawRay(center, rayDirection, Vector3.Angle(facing, rayDirection) < angle ? Color.green : Color.red);
         }
     }
 }
