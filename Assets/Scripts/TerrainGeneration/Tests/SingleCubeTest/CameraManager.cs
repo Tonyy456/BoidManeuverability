@@ -31,6 +31,6 @@ public class CameraManager : MonoBehaviour
     }
     private void SetCamera(GameObject cam, bool on)
     {
-        cam.active = on;
+        cam.SetActive(true);
     }
 }
