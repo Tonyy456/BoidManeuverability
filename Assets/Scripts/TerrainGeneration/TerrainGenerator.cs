@@ -19,12 +19,12 @@ namespace TerrainGeneration.Version3
             switch (generationType)
             {
                 case Algorithm.HeightMapper:
-                    algorithm = new HeightMapper(settings, meshObject, new Vector3());
                     settings = HeightMapSettings;
+                    algorithm = new HeightMapper(settings, meshObject, new Vector3());
                     break;
                 case Algorithm.MachingCubes:
-                    algorithm = new MarchingCubes(settings, meshObject);
                     settings = CubeSettings;
+                    algorithm = new MarchingCubes(settings, meshObject);
                     break;           
             }
             IEnumerator routine = algorithm.Generate();

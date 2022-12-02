@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class PerlinNoise
 {
+    public static float Noise2D(Vector3 point, float frequency, float seed)
+    {
+        return Noise2D(new Vector2(point.x, point.z), frequency, seed);
+    }
     public static float Noise2D(Vector2 point, float frequency, float seed)
     {
         point += new Vector2(seed, seed) * 2.12443f; //random scaling for fun

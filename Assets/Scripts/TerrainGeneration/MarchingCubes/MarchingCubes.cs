@@ -30,7 +30,7 @@ public class MarchingCubes : ITerrainAlgorithm
      */
     public IEnumerator Generate()
     {
-        graph = new GridGraph(settings.center, settings.resolution, settings.pointSeperation);
+        GridGraph graph = new GridGraph(settings.center, settings.resolution, settings.pointSeperation);
         NoiseStatusGenerator generator = new NoiseStatusGenerator(graph, settings.frequency, settings.surface, settings.seed);
         MCCubes marchingCubes = new MCCubes(graph, generator);
 
@@ -38,7 +38,14 @@ public class MarchingCubes : ITerrainAlgorithm
         mesh.vertices = graph.GetMeshIndicies();
         mesh.triangles = marchingCubes.March();
 
+        mesh.RecalculateBounds();
+        mesh.RecalculateTangents();
         mesh.RecalculateNormals();
+        mesh.Optimize();
+
+        IMeshColorer colorer = new NormalMeshColorer(mesh, settings.HeightColorGradient);
+        colorer.Color();
+
         filter.mesh = mesh;
 
         yield return null;

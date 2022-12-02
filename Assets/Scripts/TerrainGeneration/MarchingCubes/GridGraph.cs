@@ -89,7 +89,7 @@ public class GridGraph
      */
     private void GenerateEdges()
     {
-        if (vertices != null) throw new System.Exception("Generating edges before vertices generated");
+        if (vertices == null) throw new System.Exception("Generating edges before vertices generated");
 
         meshIndex = new Dictionary<Vector3, int>();
         Xparallel = new Vector3[Resolution.x - 1, Resolution.y, Resolution.z];
