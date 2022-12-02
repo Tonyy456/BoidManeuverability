@@ -32,27 +32,11 @@ public class SingleCubeTest : MonoBehaviour
     MCCubes mc;
     public void Start()
     {
-        mc = new MCCubes(position, dimensions, seperation);
-        GameObject parent = new GameObject("vertices");
-        foreach (Vertex v in mc.graph.getVertices())
-        {
-            GameObject circle = Instantiate(vertex);
-            circle.transform.position = v.Position;
-            ToggleSphere comp = circle.AddComponent<ToggleSphere>();
-            comp.Initialize(v, this);
-            circle.transform.parent = parent.transform;
-        }
 
-        meshFilter.mesh = new Mesh();
-        meshFilter.mesh.vertices = mc.graph.getMeshVertices();
-
-        Load();  
     }
 
     public void Load()
     {
-        mc.March();
-        meshFilter.mesh.triangles = mc.Triangles;
-        meshFilter.mesh.RecalculateNormals();
+
     }
 }

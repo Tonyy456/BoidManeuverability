@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -6,69 +7,51 @@ using UnityEngine.UIElements;
 
 public class MCCubes
 {
-    private Vector3 center;
-    private Vector3Int dimensions;
-    private float seperation;
+    private VertexStatusGenerator generator;
+    public GridGraph graph { get; set; }
+    private Vector3Int dimensions { get => graph.Dimensions; }
+    public Vector3Int cubeCount { get; set; }
 
     MCCube[,,] cubes;
-    List<MCCube> lc;
-    public int[] Triangles
-    {
-        get
-        {
-            List<int> triangles = new List<int>();
-            foreach (var cube in cubes)
-            {
-                foreach (int item in cube.getTriangles())
-                    triangles.Add(item);
-            }
-            return triangles.ToArray();
-        }
-    }
 
-    public GridGraph graph { get; set; }
-
-    public MCCubes(Vector3 center, Vector3Int dimensions, float seperation)
+    public MCCubes(GridGraph graph, VertexStatusGenerator generator)
     {
-        this.center = center;
-        this.dimensions = dimensions;
-        this.seperation = seperation;
-        graph = new GridGraph(center, dimensions, seperation);
-        cubes = new MCCube[dimensions.x - 1, dimensions.y - 1, dimensions.z - 1];
-        lc = new List<MCCube>();
+        this.graph = graph;
+        this.generator = generator;
+        cubeCount = new Vector3Int(dimensions.x - 1, dimensions.y - 1, dimensions.z - 1);
+        cubes = new MCCube[cubeCount.x, cubeCount.y, cubeCount.z];
         CreateCubes();
     }
 
     private void CreateCubes()
     {
-        for(int i = 0; i < dimensions.x - 1; i++)
+        GridCubeIndexer indexer = new GridCubeIndexer(graph);
+        for (int i = 0; i < dimensions.x - 1; i++)
         {
             for(int j = 0; j < dimensions.y - 1; j++)
             {
                 for(int k = 0; k < dimensions.z - 1; k++)
                 {
-                    MCCube cube = new MCCube(graph.getVerticesForCube(i, j, k), graph.getEdgesForCube(i, j, k));
+                    Vector3[] vertices = indexer.getVerticesForCube(i, j, k);
+                    bool[] status = generator.getStatusForCube(i, j, k);
+                    Vector3[] edges = indexer.getEdgesForCube(i, j, k);
+                    int[] meshIndex = indexer.getEdgeIndices(edges);
+                    MCCube cube = new MCCube(vertices, status, edges, meshIndex);
                     cubes[i, j, k] = cube;
-                    lc.Add(cube);
                 }
             }
         }
     }
 
-    public void March()
+    public int[] March()
     {
+        List<int> triangles = new List<int>();
         foreach(MCCube cube in cubes)
         {
             cube.March();
-        }       
-    }
-
-    public int CubeCount { get { return (dimensions.x - 1) * (dimensions.y - 1) * (dimensions.z - 1); } }
-
-    public List<int> March(int index)
-    {
-        MCCube cube = lc[index];
-        cube.March();
-        return cube.getTriangles();
+            foreach (int i in cube.triangles)
+                triangles.Add(i);
+        }
+        return triangles.ToArray();
     }
 }

@@ -7,8 +7,6 @@ public class ToggleSphere : MonoBehaviour
     [SerializeField] private Color onColor = Color.white;
     [SerializeField] private Color offColor = Color.black;
     [SerializeField] private bool isOn;
-
-    private Vertex v;
     private SingleCubeTest testScript;
     public bool IsOn
     {
@@ -24,11 +22,10 @@ public class ToggleSphere : MonoBehaviour
         OnValueChange();
     }
 
-    public void Initialize(Vertex v, SingleCubeTest testScript)
+    public void Initialize(SingleCubeTest testScript)
     {
-        this.v = v;
+
         isOn = false;
-        v.IsOn = false;
         this.testScript = testScript;
         OnValueChange();
     }
@@ -44,8 +41,6 @@ public class ToggleSphere : MonoBehaviour
             this.GetComponent<MeshRenderer>().material.color = onColor;
         else
             this.GetComponent<MeshRenderer>().material.color = offColor;
-        if (v != null)
-            v.IsOn = isOn;
         if(testScript != null)
             testScript.Load();
     }
