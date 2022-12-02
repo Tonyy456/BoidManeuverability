@@ -113,11 +113,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   closeBoids: []
   openPaths: []
-  turnTowards: {x: 0, y: 0, z: 0}
   speed: 7
-  rotSpeed: 20
+  baseRotSpeed: 30
   resolution: 375
   distance: 5
+  cohesionFactor: 0.5
+  reactionDist: 2
+  leader: 0
+  avoid: 0
+  align: 0
+  cohesion: 0
+  xMin: 1
+  xMax: 10
+  yMin: 1
+  yMax: 49
+  zMin: 1
+  zMax: 49
 --- !u!1 &9147864278995668079
 GameObject:
   m_ObjectHideFlags: 0

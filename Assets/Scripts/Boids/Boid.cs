@@ -10,11 +10,11 @@ public class Boid : MonoBehaviour
     public List<RaycastHit> obstructedPaths;
 
     [Header("Individual Specs")]
-    public Vector3 turnTowards;
     public float speed = 3f;
-    public float rotSpeed = 15f;
+    public float baseRotSpeed = 15f;
     public int resolution = 375;
     public float distance = 5f;
+    public float cohesionFactor = 1f;
 
     [Header("Leader Specs")]
     public bool leader = false;
@@ -30,6 +30,10 @@ public class Boid : MonoBehaviour
     public float zMin = 1f;
     public float zMax = 49f;
 
+    private Vector3 turnTowards;
+    private bool wandering = false;
+    private Vector3 wanderTo;
+
     private void Update() {
         var bv = new BoidVision(transform.position, transform.forward, 360);
         bv.RayCast(resolution, distance);
@@ -41,10 +45,11 @@ public class Boid : MonoBehaviour
 
         //Rotations
         if (closeBoids.Count > 0) {
-            turnTowards = Avoid() + Align() + Cohesion();
+            turnTowards = Avoid() + Align() + (Cohesion() * cohesionFactor);
         } else {
-            turnTowards = Wander();
+            turnTowards = Avoid() + Wander();
         }
+        float rotSpeed = TurnSpeed();
         transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(turnTowards), rotSpeed * Time.deltaTime);
 
         //Positions
@@ -63,7 +68,13 @@ public class Boid : MonoBehaviour
             }
         }
 
-        //TODO: Avoid obstacles and walls
+        //Avoid obstacles and walls
+        if (obstructedPaths.Count > 0) {
+            foreach (Vector3 path in openPaths) {
+                turnDir += transform.position - path;
+            }
+            turnDir /= openPaths.Count;
+        }
 
         turnDir.Normalize();
         Debug.DrawRay(transform.position, turnDir * 5f, Color.green);
@@ -102,11 +113,38 @@ public class Boid : MonoBehaviour
         return turnDir;
     }
 
-    //TODO: Wander(). If there are no boids close, then wander and not just move straight
+    //If there are no boids close, then wander and not just move straight
     private Vector3 Wander() {
-        Vector3 randSpot = new Vector3(Random.Range(xMin, xMax), Random.Range(yMin, yMax), Random.Range(zMin, zMax));
+        if (!wandering) {
+            wandering = true;
+            wanderTo = new Vector3(Random.Range(xMin, xMax), Random.Range(yMin, yMax), Random.Range(zMin, zMax));
+        } 
+        
+        Vector3 turnDir = wanderTo - transform.position;
+        Debug.Log(turnDir);
 
-        return randSpot - transform.position;
+        if (turnDir.x < 0.5f && turnDir.y < 0.5f && turnDir.z < 0.5f) {
+            wandering = false;
+        }
+
+        Debug.DrawRay(transform.position, turnDir.normalized, Color.yellow);
+
+        return turnDir;
+    }
+
+    private float TurnSpeed() {
+        float speed = baseRotSpeed;
+        float minDist = 10f;
+
+        if (obstructedPaths.Count > 0) {
+            foreach(RaycastHit hit in obstructedPaths) {
+                minDist = Mathf.Min(minDist, hit.distance);
+            }
+            speed = 1 / minDist;
+        }
+        Debug.Log(speed);
+
+        return speed;
     }
 
     //Keeps boids in a certain area using teleportation
