@@ -19,17 +19,12 @@ public class NoiseStatusGenerator : VertexStatusGenerator
         bool[] result = new bool[vertices.Length];
         for(int i = 0; i < vertices.Length; i++)
         {
-            float surfaceValue = PerlinNoise.get3DPerlinNoise(vertices[i], frequency);
+            float surfaceValue = PerlinNoise.Noise3D(vertices[i], frequency);
             if (surfaceValue < surface)
                 result[i] = true;
             else
                 result[i] = false;
         }
         return result;
-    }
-
-    public Vector3[] getVertices()
-    {
-        return indexer.getMeshVertices();
     }
 }

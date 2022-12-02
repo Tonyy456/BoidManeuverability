@@ -44,7 +44,6 @@ public class MCCube
             int idx2 = TriangulationTable.triangulation[cubeIdx, i + 1];
             triangles.Add(edgeIndex[idx2]);
             int idx3 = TriangulationTable.triangulation[cubeIdx, i + 2];
-            Debug.Log(edgeIndex.Length + " " + idx3);
             triangles.Add(edgeIndex[idx3]);
         }
     }

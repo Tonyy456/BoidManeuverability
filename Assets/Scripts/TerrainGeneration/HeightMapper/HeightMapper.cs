@@ -8,12 +8,16 @@ namespace TerrainGeneration.Version3
     public class HeightMapper : ITerrainAlgorithm
     {
         private MeshFilter filter;
-        public HeightMapper(MeshFilter filer)
+        private GenerationSettings settings;
+        private Vector3 position;
+        public HeightMapper(GenerationSettings settings, MeshFilter filer, Vector3 position)
         {
+            this.settings = settings;
             this.filter = filer;
+            this.position = position;
         }
 
-        public void Generate(Vector3 position, GenerationSettings settings)
+        public IEnumerator Generate()
         {
             /*
              * Algorithm to create the points and their heights.
@@ -61,6 +65,13 @@ namespace TerrainGeneration.Version3
             mesh.colors = vertexColors.ToArray();
             mesh.RecalculateNormals();
             filter.mesh = mesh;
+
+            yield return null;
+        }
+
+        public void DrawBounds()
+        {
+
         }
 
         public Vector3 GeneratePoint(Vector2 position, GenerationSettings settings)

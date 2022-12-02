@@ -2,40 +2,50 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TerrainGeneration.Version3;
-using UnityEngine.Jobs;
-using Unity.Collections;
-using Unity.Jobs;
 
+/*
+ * Unity script that 
+ */
 public class MarchingCubes : ITerrainAlgorithm
 {
     private MeshFilter filter;
-    private Mesh mesh;
     private GenerationSettings settings;
+    private GridGraph graph;
 
-    public TMPro.TMP_Text text { get; set; }
-    public MarchingCubes(MeshFilter filter)
+    /*
+     * Constructor
+     */
+    public MarchingCubes(GenerationSettings settings, MeshFilter filter)
     {
+        this.settings = settings;
         this.filter = filter;
     }
 
-    public void Generate(Vector3 position, GenerationSettings settings)
+    /*
+     * Generate is used for a coroutine that will create the entire mesh.
+     * 
+     * Using this kind of interface allows me to yield return if I want to save
+     * processing power during the initial creation.
+     *  
+     */
+    public IEnumerator Generate()
     {
-        this.settings = settings;
-    }
-
-    public IEnumerator StartMarches()
-    {
-        GridGraph graph = new GridGraph(settings.center, settings.resolution, settings.pointSeperation);
+        graph = new GridGraph(settings.center, settings.resolution, settings.pointSeperation);
         NoiseStatusGenerator generator = new NoiseStatusGenerator(graph, settings.frequency, settings.surface, settings.seed);
         MCCubes marchingCubes = new MCCubes(graph, generator);
 
         Mesh mesh = new Mesh();
-        mesh.vertices = generator.getVertices();
+        mesh.vertices = graph.GetMeshIndicies();
         mesh.triangles = marchingCubes.March();
 
         mesh.RecalculateNormals();
         filter.mesh = mesh;
 
         yield return null;
+    }
+
+    public void DrawBounds()
+    {
+        graph.DrawBounds(Color.magenta);
     }
 }

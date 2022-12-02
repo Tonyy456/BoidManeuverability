@@ -10,35 +10,25 @@ namespace TerrainGeneration.Version3
         [SerializeField] private Algorithm generationType = Algorithm.HeightMapper;
         [SerializeField] private GenerationSettings HeightMapSettings;
         [SerializeField] private GenerationSettings CubeSettings;
-        [SerializeField] private TMPro.TMP_Text text;
 
         private ITerrainAlgorithm algorithm;
         private GenerationSettings settings;
-        private IEnumerator enumerator;
 
         public void Start()
         {
             switch (generationType)
             {
                 case Algorithm.HeightMapper:
-                    algorithm = new HeightMapper(meshObject);
+                    algorithm = new HeightMapper(settings, meshObject, new Vector3());
                     settings = HeightMapSettings;
                     break;
                 case Algorithm.MachingCubes:
-                    MarchingCubes mc = new MarchingCubes(meshObject)
-                    {
-                        text = this.text
-                    };
-                    algorithm = mc;
+                    algorithm = new MarchingCubes(settings, meshObject);
                     settings = CubeSettings;
-                    enumerator = mc.StartMarches();
                     break;           
             }
-            algorithm.Generate(new Vector3(), settings);
-            if(enumerator != null)
-            {
-                StartCoroutine(enumerator);
-            }
+            IEnumerator routine = algorithm.Generate();
+            StartCoroutine(routine);
         }
     }
 }

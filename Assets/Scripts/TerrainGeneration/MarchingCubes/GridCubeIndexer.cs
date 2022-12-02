@@ -1,106 +1,128 @@
+/*
+ *          4--------5             Y
+ *         /|       /|             |    Z
+ *        / |      / |             |   /
+ *       7--------6  |             |  /
+ *       |  |     |  |             | /
+ *       |  0-----|--1             |/
+ *       | /      | /              +--------X
+ *       |/       |/
+ *       3--------2
+ *       
+ *           +-----4------+
+ *          /|           /|
+ *         7 |          5 |          Y
+ *        /  |         /  |          |    
+ *       +------6-----+   |          |   Z
+ *       |   |        |   9          |  /
+ *       |   8        |   |          | /
+ *       |   |        10  |          |/
+ *       11  |        |   |          +--------X
+ *       |   +-----0--|---+           
+ *       |  /         |  /
+ *       | 3          | 1
+ *       |/           |/
+ *       +------2-----+
+ *
+ * GridCubeIndexer is a class that takes a graph and indexes vertices and edges
+ * based on the subindex of a cube.
+ * 
+ * a 3d array of points equally seperated forms smaller cubes.
+ * Cube(0,0,0) starts at the most negative coordinates.
+ */
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 public class GridCubeIndexer
 {
-    private GridGraph graph;
-    private Vector3[,,] vertices { get => graph.vertices; }
-    private Vector3[,,] Xparallel { get => graph.Xparallel; }
-    private Vector3[,,] Yparallel { get => graph.Yparallel; }
-    private Vector3[,,] Zparallel { get => graph.Zparallel; }
-
-    public GridCubeIndexer(GridGraph graph)
+    /*
+     *  Static list makes code more understanble. Clear to see how the indexing works.
+     *  vertexIndexer: convert vertex index to the relative vertex index into 3d array based on index of the cube.
+     *  edgeIndexer: tuple contains the relative index of the edge like above... and the axis that edge is parallel to.
+     */
+    private static Vector3Int[] vertexIndexer = new Vector3Int[8]
     {
-        this.graph = graph;
-    }
+        new Vector3Int(0,0,1),
+        new Vector3Int(1,0,1),
+        new Vector3Int(1,0,0),
+        new Vector3Int(0,0,0),
+        new Vector3Int(0,1,1),
+        new Vector3Int(1,1,1),
+        new Vector3Int(1,1,0),
+        new Vector3Int(0,1,0)
+    };
+    private static (Vector3Int relativeIndex, int axis)[] edgeIndexer = new (Vector3Int relativeIndex, int axis)[12]
+    {   
+        (new Vector3Int(0,0,1), 1),
+        (new Vector3Int(1,0,0), 3),
+        (new Vector3Int(0,0,0), 1),
+        (new Vector3Int(0,0,0), 3),
+        (new Vector3Int(0,1,1), 1),
+        (new Vector3Int(1,1,0), 3),
+        (new Vector3Int(0,1,0), 1),
+        (new Vector3Int(0,1,0), 3),
+        (new Vector3Int(0,0,1), 2),
+        (new Vector3Int(1,0,1), 2),
+        (new Vector3Int(1,0,0), 2),
+        (new Vector3Int(0,0,0), 2)
+    };
 
+    private GridGraph graph;
+    private Vector3[,,] gridVertices { get => graph.vertices; }
+    private Vector3[,,] XEdges { get => graph.Xparallel; }
+    private Vector3[,,] YEdges { get => graph.Yparallel; }
+    private Vector3[,,] ZEdges { get => graph.Zparallel; }
+
+    /*
+     * Constructor
+     */
+    public GridCubeIndexer(GridGraph graph) => this.graph = graph;
+
+    /*
+     * Get the vertices for a cube at index x,y,z
+     * where 0,0,0 is the cube furthest in the negative x,y,z direction.
+     */
     public Vector3[] getVerticesForCube(int x, int y, int z)
     {
-        Vector3[] vertices = new Vector3[8];
-
-        vertices[0] = this.vertices[x, y, z + 1];
-        vertices[1] = this.vertices[x + 1, y, z + 1];
-        vertices[2] = this.vertices[x + 1, y, z];
-        vertices[3] = this.vertices[x, y, z];
-        vertices[4] = this.vertices[x, y + 1, z + 1];
-        vertices[5] = this.vertices[x + 1, y + 1, z + 1];
-        vertices[6] = this.vertices[x + 1, y + 1, z];
-        vertices[7] = this.vertices[x, y + 1, z];
-        return vertices;
-    }
-
-    public Vector3[] getMeshVertices()
-    {
-        List<Vector3> vertices = new List<Vector3>();
-        for(int z = 0; z < graph.Dimensions.z; z++)
+        Vector3[] cubeVertices = new Vector3[8];
+        for(int i = 0; i < 8; i++)
         {
-            for(int y = 0; y < graph.Dimensions.y; y++)
-            {
-                for (int x = 0; x < graph.Dimensions.x; x++)
-                {
-                    vertices.Add(graph.vertices[x, y, z]);
-                }
-            }
+            Vector3Int ind = vertexIndexer[i] + new Vector3Int(x,y,z);
+            cubeVertices[i] = gridVertices[ind.x, ind.y, ind.z];
         }
-        return vertices.ToArray();
+        return cubeVertices;
     }
 
-    private int getMeshindex(int x, int y, int z) =>
-        x + graph.Dimensions.x * y + graph.Dimensions.x * graph.Dimensions.y * z;
-    public int[] getEdgeIndices(Vector3[] edges)
-    {
-        int[] edgeIndices = new int[12];
-        for(int i = 0; i < 12; i++)
-        {
-            edgeIndices[i] = graph.getMeshIndex(edges[i]);
-        }
-
-        return edgeIndices;
-    }
+    /*
+     * Get the edges in a list in the correct way defined at the top of this file.
+     */
     public Vector3[] getEdgesForCube(int x, int y, int z)
     {
         Vector3[] edges = new Vector3[12];
-        edges[0] = Xparallel[x, y, z + 1];
-        edges[1] = Zparallel[x + 1, y, z];
-        edges[2] = Xparallel[x, y, z];
-        edges[3] = Zparallel[x, y, z];
-        edges[4] = Xparallel[x, y + 1, z + 1];
-        edges[5] = Zparallel[x + 1, y + 1, z];
-        edges[6] = Xparallel[x, y + 1, z];
-        edges[7] = Zparallel[x, y + 1, z];
-        edges[8] = Yparallel[x, y, z + 1];
-        edges[9] = Yparallel[x + 1, y, z + 1];
-        edges[10] = Yparallel[x + 1, y, z];
-        edges[11] = Yparallel[x, y, z];
+        for(int i = 0; i < 12; i++)
+        {
+            var relIndex = edgeIndexer[i];
+            Vector3Int ind = relIndex.relativeIndex + new Vector3Int(x,y,z);
+            edges[i] = relIndex.axis switch
+            { //index into the correct array of edges based on the axis
+                1 => XEdges[ind.x, ind.y, ind.z],
+                2 => YEdges[ind.x, ind.y, ind.z],
+                _ => ZEdges[ind.x, ind.y, ind.z],
+            };
+        }
         return edges;
     }
 
     /*
-     *          4--------5             Y
-     *         /|       /|             |    Z
-     *        / |      / |             |   /
-     *       7--------6  |             |  /
-     *       |  |     |  |             | /
-     *       |  0-----|--1             |/
-     *       | /      | /              +--------X
-     *       |/       |/
-     *       3--------2
-     *       
-     *           +-----4------+
-     *          /|           /|
-     *         7 |          5 |          Y
-     *        /  |         /  |          |    
-     *       +------6-----+   |          |   Z
-     *       |   |        |   9          |  /
-     *       |   8        |   |          | /
-     *       |   |        10  |          |/
-     *       11  |        |   |          +--------X
-     *       |   +-----0--|---+           
-     *       |  /         |  /
-     *       | 3          | 1
-     *       |/           |/
-     *       +------2-----+
-     * 
+     * Get the mesh indices for each edge in a parallel array.
      */
+    public int[] getEdgeIndices(Vector3[] edges)
+    {
+        int[] edgeIndices = new int[12];
+        for(int i = 0; i < 12; i++)
+            edgeIndices[i] = graph.GetMeshIndex(edges[i]);
+        return edgeIndices;
+    }
+
 }

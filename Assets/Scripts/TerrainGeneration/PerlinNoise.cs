@@ -4,8 +4,76 @@ using UnityEngine;
 
 public class PerlinNoise
 {
+    public static float Noise2D(Vector2 point, float frequency, float seed)
+    {
+        point += new Vector2(seed, seed) * 2.12443f; //random scaling for fun
+        return Mathf.PerlinNoise(point.x * frequency, point.y * frequency);
+    }
+    /*
+     * #################################################
+     * 3D perlin noise
+     * https://github.com/motudev/3dperlinNoiseTut
+     * #################################################
+     */
+    public static float Noise3D(Vector3 point, float frequency)
+    {
+        point *= frequency;
 
+        int flooredPointX0 = Mathf.FloorToInt(point.x);
+        int flooredPointY0 = Mathf.FloorToInt(point.y);
+        int flooredPointZ0 = Mathf.FloorToInt(point.z);
 
+        float distanceX0 = point.x - flooredPointX0;
+        float distanceY0 = point.y - flooredPointY0;
+        float distanceZ0 = point.z - flooredPointZ0;
+
+        float distanceX1 = distanceX0 - 1f;
+        float distanceY1 = distanceY0 - 1f;
+        float distanceZ1 = distanceZ0 - 1f;
+
+        flooredPointX0 &= permutationCount;
+        flooredPointY0 &= permutationCount;
+        flooredPointZ0 &= permutationCount;
+
+        int flooredPointX1 = flooredPointX0 + 1;
+        int flooredPointY1 = flooredPointY0 + 1;
+        int flooredPointZ1 = flooredPointZ0 + 1;
+
+        int permutationX0 = permutation[flooredPointX0];
+        int permutationX1 = permutation[flooredPointX1];
+
+        int permutationY00 = permutation[permutationX0 + flooredPointY0];
+        int permutationY10 = permutation[permutationX1 + flooredPointY0];
+        int permutationY01 = permutation[permutationX0 + flooredPointY1];
+        int permutationY11 = permutation[permutationX1 + flooredPointY1];
+
+        Vector3 direction000 = directions[permutation[permutationY00 + flooredPointZ0] & directionCount];
+        Vector3 direction100 = directions[permutation[permutationY10 + flooredPointZ0] & directionCount];
+        Vector3 direction010 = directions[permutation[permutationY01 + flooredPointZ0] & directionCount];
+        Vector3 direction110 = directions[permutation[permutationY11 + flooredPointZ0] & directionCount];
+        Vector3 direction001 = directions[permutation[permutationY00 + flooredPointZ1] & directionCount];
+        Vector3 direction101 = directions[permutation[permutationY10 + flooredPointZ1] & directionCount];
+        Vector3 direction011 = directions[permutation[permutationY01 + flooredPointZ1] & directionCount];
+        Vector3 direction111 = directions[permutation[permutationY11 + flooredPointZ1] & directionCount];
+
+        float value000 = scalar(direction000, new Vector3(distanceX0, distanceY0, distanceZ0));
+        float value100 = scalar(direction100, new Vector3(distanceX1, distanceY0, distanceZ0));
+        float value010 = scalar(direction010, new Vector3(distanceX0, distanceY1, distanceZ0));
+        float value110 = scalar(direction110, new Vector3(distanceX1, distanceY1, distanceZ0));
+        float value001 = scalar(direction001, new Vector3(distanceX0, distanceY0, distanceZ1));
+        float value101 = scalar(direction101, new Vector3(distanceX1, distanceY0, distanceZ1));
+        float value011 = scalar(direction011, new Vector3(distanceX0, distanceY1, distanceZ1));
+        float value111 = scalar(direction111, new Vector3(distanceX1, distanceY1, distanceZ1));
+
+        float smoothDistanceX = smoothDistance(distanceX0);
+        float smoothDistanceY = smoothDistance(distanceY0);
+        float smoothDistanceZ = smoothDistance(distanceZ0);
+
+        return Mathf.Lerp(
+            Mathf.Lerp(Mathf.Lerp(value000, value100, smoothDistanceX), Mathf.Lerp(value010, value110, smoothDistanceX), smoothDistanceY),
+            Mathf.Lerp(Mathf.Lerp(value001, value101, smoothDistanceX), Mathf.Lerp(value011, value111, smoothDistanceX), smoothDistanceY),
+            smoothDistanceZ);
+    }
     private static int[] permutation = {
         151,160,137, 91, 90, 15,131, 13,201, 95, 96, 53,194,233,  7,225,
         140, 36,103, 30, 69,142,  8, 99, 37,240, 21, 10, 23,190,  6,148,
@@ -75,120 +143,4 @@ public class PerlinNoise
     {
         return d * d * d * (d * (d * 6f - 15f) + 10f);
     }
-    public static float get3DPerlinNoise(Vector3 point, float frequency)
-    {
-        point *= frequency;
-
-        int flooredPointX0 = Mathf.FloorToInt(point.x);
-        int flooredPointY0 = Mathf.FloorToInt(point.y);
-        int flooredPointZ0 = Mathf.FloorToInt(point.z);
-
-        float distanceX0 = point.x - flooredPointX0;
-        float distanceY0 = point.y - flooredPointY0;
-        float distanceZ0 = point.z - flooredPointZ0;
-
-        float distanceX1 = distanceX0 - 1f;
-        float distanceY1 = distanceY0 - 1f;
-        float distanceZ1 = distanceZ0 - 1f;
-
-        flooredPointX0 &= permutationCount;
-        flooredPointY0 &= permutationCount;
-        flooredPointZ0 &= permutationCount;
-
-        int flooredPointX1 = flooredPointX0 + 1;
-        int flooredPointY1 = flooredPointY0 + 1;
-        int flooredPointZ1 = flooredPointZ0 + 1;
-
-        int permutationX0 = permutation[flooredPointX0];
-        int permutationX1 = permutation[flooredPointX1];
-
-        int permutationY00 = permutation[permutationX0 + flooredPointY0];
-        int permutationY10 = permutation[permutationX1 + flooredPointY0];
-        int permutationY01 = permutation[permutationX0 + flooredPointY1];
-        int permutationY11 = permutation[permutationX1 + flooredPointY1];
-        /*
-                int permutationZ000 = permutation[permutationY00 + flooredPointZ0];
-                int permutationZ100 = permutation[permutationY10 + flooredPointZ0];
-                int permutationZ010 = permutation[permutationY01 + flooredPointZ0];
-                int permutationZ110 = permutation[permutationY11 + flooredPointZ0];
-                int permutationZ001 = permutation[permutationY00 + flooredPointZ1];
-                int permutationZ101 = permutation[permutationY01 + flooredPointZ1];
-                int permutationZ011 = permutation[permutationY10 + flooredPointZ1];
-                int permutationZ111 = permutation[permutationY11 + flooredPointZ1];
-        */
-        Vector3 direction000 = directions[permutation[permutationY00 + flooredPointZ0] & directionCount];
-        Vector3 direction100 = directions[permutation[permutationY10 + flooredPointZ0] & directionCount];
-        Vector3 direction010 = directions[permutation[permutationY01 + flooredPointZ0] & directionCount];
-        Vector3 direction110 = directions[permutation[permutationY11 + flooredPointZ0] & directionCount];
-        Vector3 direction001 = directions[permutation[permutationY00 + flooredPointZ1] & directionCount];
-        Vector3 direction101 = directions[permutation[permutationY10 + flooredPointZ1] & directionCount];
-        Vector3 direction011 = directions[permutation[permutationY01 + flooredPointZ1] & directionCount];
-        Vector3 direction111 = directions[permutation[permutationY11 + flooredPointZ1] & directionCount];
-
-        /*
-                Vector3 direction000 = directions[permutationZ000 & directionCount];
-                Vector3 direction100 = directions[permutationZ100 & directionCount];
-                Vector3 direction010 = directions[permutationZ010 & directionCount];
-                Vector3 direction110 = directions[permutationZ110 & directionCount];
-                Vector3 direction001 = directions[permutationZ001 & directionCount];
-                Vector3 direction101 = directions[permutationZ101 & directionCount];
-                Vector3 direction011 = directions[permutationZ011 & directionCount];
-                Vector3 direction111 = directions[permutationZ111 & directionCount];
-        */
-
-        float value000 = scalar(direction000, new Vector3(distanceX0, distanceY0, distanceZ0));
-        float value100 = scalar(direction100, new Vector3(distanceX1, distanceY0, distanceZ0));
-        float value010 = scalar(direction010, new Vector3(distanceX0, distanceY1, distanceZ0));
-        float value110 = scalar(direction110, new Vector3(distanceX1, distanceY1, distanceZ0));
-        float value001 = scalar(direction001, new Vector3(distanceX0, distanceY0, distanceZ1));
-        float value101 = scalar(direction101, new Vector3(distanceX1, distanceY0, distanceZ1));
-        float value011 = scalar(direction011, new Vector3(distanceX0, distanceY1, distanceZ1));
-        float value111 = scalar(direction111, new Vector3(distanceX1, distanceY1, distanceZ1));
-
-        float smoothDistanceX = smoothDistance(distanceX0);
-        float smoothDistanceY = smoothDistance(distanceY0);
-        float smoothDistanceZ = smoothDistance(distanceZ0);
-
-        return Mathf.Lerp(
-            Mathf.Lerp(Mathf.Lerp(value000, value100, smoothDistanceX), Mathf.Lerp(value010, value110, smoothDistanceX), smoothDistanceY),
-            Mathf.Lerp(Mathf.Lerp(value001, value101, smoothDistanceX), Mathf.Lerp(value011, value111, smoothDistanceX), smoothDistanceY),
-            smoothDistanceZ);
-    }
-
-
-
-
-    public static float PerlinNoise3D(float x, float y, float z, float frequency = 1)
-    {
-        y += 100123120;
-        z += 213123;
-        float xy = _perlin3DFixed(x, y , frequency);
-        float xz = _perlin3DFixed(x, z , frequency);
-        float yz = _perlin3DFixed(y, z , frequency);
-        float yx = _perlin3DFixed(y, x , frequency);
-        float zx = _perlin3DFixed(z, x , frequency);
-        float zy = _perlin3DFixed(z, y , frequency);
-        return xy * xz * yz * yx * zx * zy;
-    }
-    public static float _perlin3DFixed(float a, float b, float frequency)
-    {
-        return Mathf.Sin(Mathf.PI * Mathf.PerlinNoise((a + 10123405f) * frequency , (b + 100000f) * frequency));
-    }
-    public static float GetNoiseAt(int x, int z, float scale, float heightMultiplier, int octaves, float persistance, float lacunarity)
-    {
-        float PerlinValue = 0f;
-        float amplitude = 1f;
-        float frequency = 1f;
-        for (int i = 0; i < octaves; i++)
-        {
-            // Get the perlin value at that octave and add it to the sum
-            PerlinValue += Mathf.PerlinNoise(x * frequency, z * frequency) * amplitude;
-            // Decrease the amplitude and the frequency
-            amplitude *= persistance;
-            frequency *= lacunarity;
-        }
-        // Return the noise value
-        return PerlinValue * heightMultiplier;
-    }
-
 }
