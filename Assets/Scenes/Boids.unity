@@ -631,7 +631,7 @@ MonoBehaviour:
   - {x: 3, y: 5, z: 5}
   - {x: 3, y: 10, z: 5}
   boid: {fileID: 6596300666820297869, guid: 79ada21f12d43a2419624557e610a25e, type: 3}
-  boidNum: 10
+  boidNum: 1
 --- !u!4 &1723516389
 Transform:
   m_ObjectHideFlags: 0

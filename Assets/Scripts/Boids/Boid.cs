@@ -11,7 +11,7 @@ public class Boid : MonoBehaviour
 
     [Header("Individual Specs")]
     public float speed = 3f;
-    public float rotSpeed = 15f;
+    public float baseRotSpeed = 15f;
     public int resolution = 375;
     public float distance = 5f;
     public float cohesionFactor = 1f;
@@ -47,8 +47,9 @@ public class Boid : MonoBehaviour
         if (closeBoids.Count > 0) {
             turnTowards = Avoid() + Align() + (Cohesion() * cohesionFactor);
         } else {
-            turnTowards = Wander();
+            turnTowards = Avoid() + Wander();
         }
+        float rotSpeed = TurnSpeed();
         transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(turnTowards), rotSpeed * Time.deltaTime);
 
         //Positions
@@ -67,7 +68,13 @@ public class Boid : MonoBehaviour
             }
         }
 
-        //TODO: Avoid obstacles and walls
+        //Avoid obstacles and walls
+        if (obstructedPaths.Count > 0) {
+            foreach (Vector3 path in openPaths) {
+                turnDir += transform.position - path;
+            }
+            turnDir /= openPaths.Count;
+        }
 
         turnDir.Normalize();
         Debug.DrawRay(transform.position, turnDir * 5f, Color.green);
@@ -106,7 +113,7 @@ public class Boid : MonoBehaviour
         return turnDir;
     }
 
-    //TODO: Wander(). If there are no boids close, then wander and not just move straight
+    //If there are no boids close, then wander and not just move straight
     private Vector3 Wander() {
         if (!wandering) {
             wandering = true;
@@ -120,9 +127,24 @@ public class Boid : MonoBehaviour
             wandering = false;
         }
 
-        Debug.DrawRay(transform.position, turnDir, Color.yellow);
+        Debug.DrawRay(transform.position, turnDir.normalized, Color.yellow);
 
         return turnDir;
+    }
+
+    private float TurnSpeed() {
+        float speed = baseRotSpeed;
+        float minDist = 10f;
+
+        if (obstructedPaths.Count > 0) {
+            foreach(RaycastHit hit in obstructedPaths) {
+                minDist = Mathf.Min(minDist, hit.distance);
+            }
+            speed = 1 / minDist;
+        }
+        Debug.Log(speed);
+
+        return speed;
     }
 
     //Keeps boids in a certain area using teleportation
