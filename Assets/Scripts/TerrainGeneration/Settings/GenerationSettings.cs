@@ -38,7 +38,6 @@ namespace TerrainGeneration.Version3
         public Vector3Int chunkAtVector(Vector3 position)
         {
             int x = Mathf.RoundToInt((position.x - center.x) / pointSeperation / (chunkDimensions.x - 1));
-            Debug.Log(x);
             return new Vector3Int();
         }
     }

@@ -77,7 +77,10 @@ public class GridCubeIndexer
     /*
      * Constructor
      */
-    public GridCubeIndexer(GridGraph graph) => this.graph = graph;
+    public GridCubeIndexer(GridGraph graph)
+    {
+        this.graph = graph;
+    }
 
     /*
      * Get the vertices for a cube at index x,y,z
@@ -90,6 +93,19 @@ public class GridCubeIndexer
         {
             Vector3Int ind = vertexIndexer[i] + new Vector3Int(x,y,z);
             cubeVertices[i] = gridVertices[ind.x, ind.y, ind.z];
+        }
+
+        Vector3 center = Vector3.zero;
+        foreach (Vector3 var in cubeVertices)
+            center += var;
+        center /= 8f;
+        float height = Mathf.Abs(cubeVertices[0].x - cubeVertices[1].x);
+        Cube cube = new Cube(center, height);
+        Vector3[] newVertices = cube.getVerticesForCube(0, 0, 0);
+        for(int i = 0; i < 8; i++)
+        {
+            if (newVertices[i] != cubeVertices[i])
+                Debug.Log($"{i} for cube {x},{y},{z}: {newVertices[i]} != {cubeVertices[i]}");
         }
         return cubeVertices;
     }
@@ -111,6 +127,7 @@ public class GridCubeIndexer
                 _ => ZEdges[ind.x, ind.y, ind.z],
             };
         }
+
         return edges;
     }
 

@@ -32,7 +32,7 @@ public class GridGraph
     public Vector3Int Resolution { get; set; }
 
     //define all vertices and edges
-
+    public Cube[,,] subCubes;
     public Vector3[,,] vertices { get; set; }
     public Vector3[,,] Xparallel { get; set; }
     public Vector3[,,] Yparallel { get; set; }
@@ -55,8 +55,31 @@ public class GridGraph
             -size.y / 2 + graphCenter.y,
             -size.z / 2 + graphCenter.z);
 
+        GenerateCubes();
         GenerateVertices();
         GenerateEdges();
+    }
+
+    private void GenerateCubes()
+    {
+        Vector3 cubeDim = new Vector3(pointSeperation, pointSeperation, pointSeperation);
+        Vector3 center000 = startPoint + cubeDim / 2f;
+
+        Vector3Int dim = new Vector3Int(Resolution.x - 1, Resolution.y - 1, Resolution.z - 1);
+        subCubes = new Cube[dim.x, dim.y, dim.z];
+        for (int x = 0; x < dim.x; x++)
+        {
+            for (int y = 0; y < dim.y; y++)
+            {
+                for (int z = 0; z < dim.z; z++)
+                {
+                    Vector3 center = center000;
+                    center += (Vector3.Scale(new Vector3(x, y, z), cubeDim));
+                    float height = pointSeperation;
+                    subCubes[x, y, z] = new Cube(center, height);
+                }
+            }
+        }
     }
 
     /*
