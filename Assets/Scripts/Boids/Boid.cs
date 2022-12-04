@@ -12,27 +12,13 @@ public class Boid : MonoBehaviour
     [Header("Individual Specs")]
     public float speed = 3f;
     public float baseRotSpeed = 15f;
+    public float maxRotSpeed = 90f;
     public int resolution = 375;
     public float distance = 5f;
     public float cohesionFactor = 1f;
-
-    [Header("Leader Specs")]
-    public bool leader = false;
-    public bool avoid = false;
-    public bool align = false;
-    public bool cohesion = false;
-
-    [Header("Boundaries")]
-    public float xMin = 1f;
-    public float xMax = 10f;
-    public float yMin = 1f;
-    public float yMax = 49f;
-    public float zMin = 1f;
-    public float zMax = 49f;
+    public float avoidCollisionWeight = 2f;
 
     private Vector3 turnTowards;
-    private bool wandering = false;
-    private Vector3 wanderTo;
 
     private void Update() {
         var bv = new BoidVision(transform.position, transform.forward, 360);
@@ -44,22 +30,22 @@ public class Boid : MonoBehaviour
         obstructedPaths = bv.Hits;
 
         //Rotations
-        if (closeBoids.Count > 0) {
-            turnTowards = Avoid() + Align() + (Cohesion() * cohesionFactor);
-        } else {
-            turnTowards = Avoid() + Wander();
-        }
+        turnTowards = AvoidWalls() + AvoidBoids() + Align() + Cohesion();
+
         float rotSpeed = TurnSpeed();
         transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(turnTowards), rotSpeed * Time.deltaTime);
 
         //Positions
-        BoundPosition();
-        transform.position += transform.forward.normalized * speed * Time.deltaTime;
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.forward, out hit, distance))
+            transform.position += transform.forward.normalized * (speed  / (distance / hit.distance)) * Time.deltaTime;
+        else
+            transform.position += transform.forward.normalized * speed * Time.deltaTime;
     }
 
-    //Avoid objects that get too close
-    private Vector3 Avoid() {
-        Vector3 turnDir = new Vector3();
+    //Avoid other close boids
+    private Vector3 AvoidBoids() {
+        Vector3 turnDir = Vector3.zero;
 
         //Avoid other boids
         foreach (Transform x in closeBoids) {
@@ -67,30 +53,36 @@ public class Boid : MonoBehaviour
                 turnDir += transform.position - x.transform.position;
             }
         }
-
-        //Avoid obstacles and walls
-        if (obstructedPaths.Count > 0) {
-            foreach (Vector3 path in openPaths) {
-                turnDir += transform.position - path;
-            }
-            turnDir /= openPaths.Count;
-        }
-
         turnDir.Normalize();
+
         Debug.DrawRay(transform.position, turnDir * 5f, Color.green);
 
         return turnDir;
     }
 
+    //Avoid walls and obstacles
+    private Vector3 AvoidWalls() {
+        Vector3 bestPath = openPaths[0];
+
+        //Avoid walls
+        foreach (Vector3 v in openPaths) {
+            bestPath = Vector3.Distance(v, transform.forward) < Vector3.Distance(bestPath, transform.forward) ? v : bestPath;
+        }
+        Debug.DrawRay(transform.position, bestPath.normalized * 5f, Color.cyan);
+
+        return bestPath;
+    }
+
     //Align with the average look direction of other close boids
     private Vector3 Align() {
-        Vector3 turnDir = new Vector3();
+        Vector3 turnDir = Vector3.zero;
 
         foreach (Transform x in closeBoids) {
             turnDir += x.transform.forward;
         }
 
-        turnDir /= closeBoids.Count;
+        if (closeBoids.Count > 0)
+            turnDir /= closeBoids.Count;
         Debug.DrawRay(transform.position, turnDir * 5f, Color.red);
 
         return turnDir;
@@ -98,68 +90,30 @@ public class Boid : MonoBehaviour
 
     //Try and move towards the average position of closeboids
     private Vector3 Cohesion() {
-        Vector3 turnDir = new Vector3();
-        Vector3 avgPos = new Vector3();
+        Vector3 avgPos = Vector3.zero;
 
-        foreach (Transform x in closeBoids) {
-            avgPos += x.transform.position;
-        }
-        avgPos /= closeBoids.Count;
-
-        turnDir = avgPos - transform.position;
-        turnDir.Normalize();
-        Debug.DrawRay(transform.position, turnDir * 5f, Color.blue);
-
-        return turnDir;
-    }
-
-    //If there are no boids close, then wander and not just move straight
-    private Vector3 Wander() {
-        if (!wandering) {
-            wandering = true;
-            wanderTo = new Vector3(Random.Range(xMin, xMax), Random.Range(yMin, yMax), Random.Range(zMin, zMax));
-        } 
-        
-        Vector3 turnDir = wanderTo - transform.position;
-        Debug.Log(turnDir);
-
-        if (turnDir.x < 0.5f && turnDir.y < 0.5f && turnDir.z < 0.5f) {
-            wandering = false;
+        if (closeBoids.Count > 0) {
+            foreach (Transform x in closeBoids) {
+                avgPos += x.transform.position;
+            }
+            avgPos /= closeBoids.Count;
         }
 
-        Debug.DrawRay(transform.position, turnDir.normalized, Color.yellow);
+        Debug.DrawRay(transform.position, (avgPos - transform.position).normalized * 5f, Color.blue);
 
-        return turnDir;
+        return avgPos - transform.position;
     }
 
+    //Changes turn speed based on how close the wall is
     private float TurnSpeed() {
-        float speed = baseRotSpeed;
         float minDist = 10f;
 
-        if (obstructedPaths.Count > 0) {
-            foreach(RaycastHit hit in obstructedPaths) {
-                minDist = Mathf.Min(minDist, hit.distance);
-            }
-            speed = 1 / minDist;
+        foreach(RaycastHit hit in obstructedPaths) {
+            minDist = Mathf.Min(minDist, hit.distance);
         }
-        Debug.Log(speed);
 
-        return speed;
-    }
+        var speed = (baseRotSpeed * (distance / minDist));
 
-    //Keeps boids in a certain area using teleportation
-    private void BoundPosition() {
-        if (transform.position.z > zMax + 0.5f)
-            transform.position = new Vector3(transform.position.x, transform.position.y, zMin + 0.5f);
-        if (transform.position.z < zMin - 0.5f)
-            transform.position = new Vector3(transform.position.x, transform.position.y, zMax - 0.5f);
-        if (transform.position.y > yMax + 0.5f)
-            transform.position = new Vector3(transform.position.x, yMin + 0.5f, transform.position.z);
-        if (transform.position.y < yMin - 0.5f)
-            transform.position = new Vector3(transform.position.x, yMax - 0.5f, transform.position.z);
-        if (transform.position.x > xMax + 0.5f)
-            transform.position = new Vector3(xMin + 0.5f, transform.position.y, transform.position.z);
-        if (transform.position.x < xMin - 0.5f)
-            transform.position = new Vector3(xMax - 0.5f, transform.position.y, transform.position.z);
+        return Mathf.Clamp(speed, baseRotSpeed, maxRotSpeed);
     }
 }
