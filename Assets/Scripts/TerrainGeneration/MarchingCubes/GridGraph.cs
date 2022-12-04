@@ -161,21 +161,21 @@ public class GridGraph
      */
     public void DrawBounds(Color c)
     {
-        Debug.DrawLine(vertices[0, 0, 0], vertices[0, Resolution.y - 1, 0], c);
-        Debug.DrawLine(vertices[0, 0, 0], vertices[Resolution.x - 1, 0, 0], c);
-        Debug.DrawLine(vertices[0, 0, 0], vertices[0, 0, Resolution.z - 1], c);
+        Debug.DrawLine(vertices[0, 0, 0], vertices[0, Resolution.y - 1, 0], c ,0.01f);
+        Debug.DrawLine(vertices[0, 0, 0], vertices[Resolution.x - 1, 0, 0], c, 0.01f);
+        Debug.DrawLine(vertices[0, 0, 0], vertices[0, 0, Resolution.z - 1], c, 0.01f);
 
-        Debug.DrawLine(vertices[Resolution.x - 1, 0, Resolution.z - 1], vertices[0, 0, Resolution.z - 1], c);
-        Debug.DrawLine(vertices[Resolution.x - 1, 0, Resolution.z - 1], vertices[Resolution.x - 1, Resolution.y - 1, Resolution.z - 1], c);
-        Debug.DrawLine(vertices[Resolution.x - 1, 0, Resolution.z - 1], vertices[Resolution.x - 1, 0, 0], c);
+        Debug.DrawLine(vertices[Resolution.x - 1, 0, Resolution.z - 1], vertices[0, 0, Resolution.z - 1], c, 0.01f);
+        Debug.DrawLine(vertices[Resolution.x - 1, 0, Resolution.z - 1], vertices[Resolution.x - 1, Resolution.y - 1, Resolution.z - 1], c, 0.01f);
+        Debug.DrawLine(vertices[Resolution.x - 1, 0, Resolution.z - 1], vertices[Resolution.x - 1, 0, 0], c, 0.01f);
 
-        Debug.DrawLine(vertices[0, Resolution.y - 1, Resolution.z - 1], vertices[Resolution.x - 1, Resolution.y - 1, Resolution.z - 1], c);
-        Debug.DrawLine(vertices[0, Resolution.y - 1, Resolution.z - 1], vertices[0, 0, Resolution.z - 1], c);
-        Debug.DrawLine(vertices[0, Resolution.y - 1, Resolution.z - 1], vertices[0, Resolution.y - 1, 0], c);
+        Debug.DrawLine(vertices[0, Resolution.y - 1, Resolution.z - 1], vertices[Resolution.x - 1, Resolution.y - 1, Resolution.z - 1], c, 0.01f);
+        Debug.DrawLine(vertices[0, Resolution.y - 1, Resolution.z - 1], vertices[0, 0, Resolution.z - 1], c, 0.01f);
+        Debug.DrawLine(vertices[0, Resolution.y - 1, Resolution.z - 1], vertices[0, Resolution.y - 1, 0], c, 0.01f);
 
-        Debug.DrawLine(vertices[Resolution.x - 1, Resolution.y - 1, 0], vertices[0, Resolution.y - 1, 0], c);
-        Debug.DrawLine(vertices[Resolution.x - 1, Resolution.y - 1, 0], vertices[Resolution.x - 1, 0, 0], c);
-        Debug.DrawLine(vertices[Resolution.x - 1, Resolution.y - 1, 0], vertices[Resolution.x - 1, Resolution.y - 1, Resolution.z - 1], c);
+        Debug.DrawLine(vertices[Resolution.x - 1, Resolution.y - 1, 0], vertices[0, Resolution.y - 1, 0], c, 0.01f);
+        Debug.DrawLine(vertices[Resolution.x - 1, Resolution.y - 1, 0], vertices[Resolution.x - 1, 0, 0], c, 0.01f);
+        Debug.DrawLine(vertices[Resolution.x - 1, Resolution.y - 1, 0], vertices[Resolution.x - 1, Resolution.y - 1, Resolution.z - 1], c, 0.01f);
     }
 
     public List<Vector3> getEdges() => throw new System.NotImplementedException();

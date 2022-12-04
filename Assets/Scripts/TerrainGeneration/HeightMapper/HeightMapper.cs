@@ -18,11 +18,7 @@ namespace TerrainGeneration.Version3
         }
         public IEnumerator Generate(Vector3Int chunk, MeshFilter filter)
         {
-            return null;
-        }
-        public IEnumerator Generate()
-        {
-            FlatMeshGenerator generator = new FlatMeshGenerator(settings.center, settings.resolution, settings.pointSeperation);
+            FlatMeshGenerator generator = new FlatMeshGenerator(settings.center, settings.chunkDimensions, settings.pointSeperation);
             var definition = generator.getMeshDefintion();
             Vector3[] vertices = addNoise(definition.vertices);
             int[] triangles = definition.triangles;
@@ -35,12 +31,13 @@ namespace TerrainGeneration.Version3
             mesh.RecalculateNormals();
             mesh.Optimize();
 
-            IMeshColorer colorer = new HeightMeshColorer(mesh, settings.HeightColorGradient);
+            IMeshColorer colorer = new HeightMeshColorer(mesh, settings.ColorGradient);
             colorer.Color();
 
             filter.mesh = mesh;
             yield return null;
         }
+
         public void DrawBounds()
         {
 

@@ -9,7 +9,7 @@ public class MCCubes
 {
     private VertexStatusGenerator generator;
     public GridGraph graph { get; set; }
-    private Vector3Int dimensions { get => graph.Resolution; }
+    private Vector3Int graphSize { get => graph.Resolution; }
     public Vector3Int cubeCount { get; set; }
 
     MCCube[,,] cubes;
@@ -18,7 +18,7 @@ public class MCCubes
     {
         this.graph = graph;
         this.generator = generator;
-        cubeCount = new Vector3Int(dimensions.x - 1, dimensions.y - 1, dimensions.z - 1);
+        cubeCount = new Vector3Int(graphSize.x - 1, graphSize.y - 1, graphSize.z - 1);
         cubes = new MCCube[cubeCount.x, cubeCount.y, cubeCount.z];
         CreateCubes();
     }
@@ -26,11 +26,11 @@ public class MCCubes
     private void CreateCubes()
     {
         GridCubeIndexer indexer = new GridCubeIndexer(graph);
-        for (int i = 0; i < dimensions.x - 1; i++)
+        for (int i = 0; i < graphSize.x - 1; i++)
         {
-            for(int j = 0; j < dimensions.y - 1; j++)
+            for(int j = 0; j < graphSize.y - 1; j++)
             {
-                for(int k = 0; k < dimensions.z - 1; k++)
+                for(int k = 0; k < graphSize.z - 1; k++)
                 {
                     Vector3[] vertices = indexer.getVerticesForCube(i, j, k);
                     bool[] status = generator.getStatusForCube(i, j, k);

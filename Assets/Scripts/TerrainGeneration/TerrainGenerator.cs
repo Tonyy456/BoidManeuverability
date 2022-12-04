@@ -6,15 +6,20 @@ namespace TerrainGeneration.Version3
 {
     public class TerrainGenerator : MonoBehaviour
     {
-        [SerializeField] private MeshFilter meshObject;
         [SerializeField] private GameObject meshPrefab;
+        [SerializeField] private Transform parent;
         [SerializeField] private Algorithm generationType = Algorithm.HeightMapper;
         [SerializeField] private GenerationSettings HeightMapSettings;
         [SerializeField] private GenerationSettings CubeSettings;
         [SerializeField] private Vector3Int chunksInEachDimension;
 
+        [SerializeField] private Transform objToWatch;
+        [SerializeField] private int distanceToLoad;
+
         private ITerrainAlgorithm algorithm;
         private GenerationSettings settings;
+
+        private Dictionary<Vector3Int, GameObject> gameObjects;
 
         public void Start()
         {
@@ -22,15 +27,15 @@ namespace TerrainGeneration.Version3
             {
                 case Algorithm.HeightMapper:
                     settings = HeightMapSettings;
-                    algorithm = new HeightMapper(settings, meshObject, new Vector3());
+                    algorithm = new HeightMapper(settings, null, new Vector3());
                     break;
                 case Algorithm.MachingCubes:
                     settings = CubeSettings;
-                    algorithm = new MarchingCubes(settings, meshObject);
+                    algorithm = new MarchingCubes(settings);
                     break;           
             }
+
             Mesh mesh = new Mesh();
-            int index = 0;
             for(int i = 0; i < chunksInEachDimension.x; i++)
             {
                 for(int j = 0; j < chunksInEachDimension.y; j++)
@@ -39,12 +44,19 @@ namespace TerrainGeneration.Version3
                     {
                         GameObject prefab = Instantiate(meshPrefab);
                         MeshFilter filter = prefab.GetComponent<MeshFilter>();
+                        prefab.transform.parent = transform;
+                        prefab.name = $"{i},{j},{k}";
                         Vector3Int chunk = new Vector3Int(i, j, k);        
                         IEnumerator enumer = algorithm.Generate(chunk, filter);
                         StartCoroutine(enumer);
                     }
                 }
             }
+        }
+
+        public void Update()
+        {
+            settings.chunkAtVector(transform.position);
         }
     }
 }

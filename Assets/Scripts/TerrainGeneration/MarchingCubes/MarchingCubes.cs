@@ -8,24 +8,28 @@ using TerrainGeneration.Version3;
  */
 public class MarchingCubes : ITerrainAlgorithm
 {
-    private MeshFilter filter;
     private GenerationSettings settings;
-    private GridGraph graph;
+    private List<GridGraph> graphs = new List<GridGraph>();
 
     /*
      * Constructor
      */
-    public MarchingCubes(GenerationSettings settings, MeshFilter filter)
+    public MarchingCubes(GenerationSettings settings)
     {
         this.settings = settings;
-        this.filter = filter;
     }
 
+    /*
+ * Generate is used for a coroutine that will create the entire mesh.
+ * 
+ * Using this kind of interface allows me to yield return if I want to save
+ * processing power during the initial creation.
+ *  
+ */
     public IEnumerator Generate(Vector3Int chunk, MeshFilter filter)
     {
-        Vector3 chunksize = settings.chunkSize();
-        Vector3 chunkCenter = settings.center + new Vector3(chunksize.x * chunk.x, chunksize.y * chunk.y, chunksize.z * chunk.z);
-        GridGraph graph = new GridGraph(chunkCenter, settings.chunkDimensions, settings.pointSeperation);
+        GridGraph graph = new GridGraph(settings.chunkCenter(chunk), settings.chunkDimensions, settings.pointSeperation);
+        graphs.Add(graph);
         NoiseStatusGenerator generator = new NoiseStatusGenerator(graph, settings.frequency, settings.surface, settings.seed);
         MCCubes marchingCubes = new MCCubes(graph, generator);
 
@@ -46,7 +50,7 @@ public class MarchingCubes : ITerrainAlgorithm
         mesh.RecalculateNormals();
         mesh.Optimize();
 
-        IMeshColorer colorer = new NormalMeshColorer(mesh, settings.HeightColorGradient);
+        IMeshColorer colorer = new NormalMeshColorer(mesh, settings.ColorGradient);
         colorer.Color();
 
         filter.mesh = mesh;
@@ -54,46 +58,13 @@ public class MarchingCubes : ITerrainAlgorithm
         yield return null;
     }
 
-    /*
-     * Generate is used for a coroutine that will create the entire mesh.
-     * 
-     * Using this kind of interface allows me to yield return if I want to save
-     * processing power during the initial creation.
-     *  
-     */
-    public IEnumerator Generate()
-    {
-        GridGraph graph = new GridGraph(settings.center, settings.resolution, settings.pointSeperation);
-        NoiseStatusGenerator generator = new NoiseStatusGenerator(graph, settings.frequency, settings.surface, settings.seed);
-        MCCubes marchingCubes = new MCCubes(graph, generator);
 
-        Mesh mesh = new Mesh();
-        mesh.vertices = graph.GetMeshIndicies();
-
-        List<int> triangles = new List<int>();
-        foreach(int i in marchingCubes.MarchEnumerator())
-        {
-            triangles.Add(i);
-        }
-        mesh.triangles = triangles.ToArray();
-
-        yield return new WaitForFixedUpdate();
-
-        mesh.RecalculateBounds();
-        mesh.RecalculateTangents();
-        mesh.RecalculateNormals();
-        mesh.Optimize();
-
-        IMeshColorer colorer = new NormalMeshColorer(mesh, settings.HeightColorGradient);
-        colorer.Color();
-
-        filter.mesh = mesh;
-
-        yield return null;
-    }
 
     public void DrawBounds()
     {
-        graph.DrawBounds(Color.magenta);
+        foreach (GridGraph graph in graphs)
+        {
+            graph.DrawBounds(Color.magenta);
+        }
     }
 }
