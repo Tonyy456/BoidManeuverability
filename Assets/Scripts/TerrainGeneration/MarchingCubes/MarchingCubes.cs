@@ -21,6 +21,39 @@ public class MarchingCubes : ITerrainAlgorithm
         this.filter = filter;
     }
 
+    public IEnumerator Generate(Vector3Int chunk, MeshFilter filter)
+    {
+        Vector3 chunksize = settings.chunkSize();
+        Vector3 chunkCenter = settings.center + new Vector3(chunksize.x * chunk.x, chunksize.y * chunk.y, chunksize.z * chunk.z);
+        GridGraph graph = new GridGraph(chunkCenter, settings.chunkDimensions, settings.pointSeperation);
+        NoiseStatusGenerator generator = new NoiseStatusGenerator(graph, settings.frequency, settings.surface, settings.seed);
+        MCCubes marchingCubes = new MCCubes(graph, generator);
+
+        Mesh mesh = new Mesh();
+        mesh.vertices = graph.GetMeshIndicies();
+
+        List<int> triangles = new List<int>();
+        foreach (int i in marchingCubes.MarchEnumerator())
+        {
+            triangles.Add(i);
+        }
+        mesh.triangles = triangles.ToArray();
+
+        yield return new WaitForFixedUpdate();
+
+        mesh.RecalculateBounds();
+        mesh.RecalculateTangents();
+        mesh.RecalculateNormals();
+        mesh.Optimize();
+
+        IMeshColorer colorer = new NormalMeshColorer(mesh, settings.HeightColorGradient);
+        colorer.Color();
+
+        filter.mesh = mesh;
+
+        yield return null;
+    }
+
     /*
      * Generate is used for a coroutine that will create the entire mesh.
      * 
@@ -36,7 +69,15 @@ public class MarchingCubes : ITerrainAlgorithm
 
         Mesh mesh = new Mesh();
         mesh.vertices = graph.GetMeshIndicies();
-        mesh.triangles = marchingCubes.March();
+
+        List<int> triangles = new List<int>();
+        foreach(int i in marchingCubes.MarchEnumerator())
+        {
+            triangles.Add(i);
+        }
+        mesh.triangles = triangles.ToArray();
+
+        yield return new WaitForFixedUpdate();
 
         mesh.RecalculateBounds();
         mesh.RecalculateTangents();

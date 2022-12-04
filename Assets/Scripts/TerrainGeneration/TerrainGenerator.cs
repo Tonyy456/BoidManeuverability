@@ -7,9 +7,11 @@ namespace TerrainGeneration.Version3
     public class TerrainGenerator : MonoBehaviour
     {
         [SerializeField] private MeshFilter meshObject;
+        [SerializeField] private GameObject meshPrefab;
         [SerializeField] private Algorithm generationType = Algorithm.HeightMapper;
         [SerializeField] private GenerationSettings HeightMapSettings;
         [SerializeField] private GenerationSettings CubeSettings;
+        [SerializeField] private Vector3Int chunksInEachDimension;
 
         private ITerrainAlgorithm algorithm;
         private GenerationSettings settings;
@@ -27,8 +29,22 @@ namespace TerrainGeneration.Version3
                     algorithm = new MarchingCubes(settings, meshObject);
                     break;           
             }
-            IEnumerator routine = algorithm.Generate();
-            StartCoroutine(routine);
+            Mesh mesh = new Mesh();
+            int index = 0;
+            for(int i = 0; i < chunksInEachDimension.x; i++)
+            {
+                for(int j = 0; j < chunksInEachDimension.y; j++)
+                {
+                    for(int k = 0; k < chunksInEachDimension.z; k++)
+                    {
+                        GameObject prefab = Instantiate(meshPrefab);
+                        MeshFilter filter = prefab.GetComponent<MeshFilter>();
+                        Vector3Int chunk = new Vector3Int(i, j, k);        
+                        IEnumerator enumer = algorithm.Generate(chunk, filter);
+                        StartCoroutine(enumer);
+                    }
+                }
+            }
         }
     }
 }

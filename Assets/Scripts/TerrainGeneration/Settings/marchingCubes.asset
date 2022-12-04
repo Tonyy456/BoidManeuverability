@@ -12,6 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25fb3578d9668774c8ae13f54d073881, type: 3}
   m_Name: marchingCubes
   m_EditorClassIdentifier: 
+  center: {x: 0, y: 0, z: 0}
+  chunkDimensions: {x: 5, y: 5, z: 5}
+  pointSeperation: 35
+  frequency: 0.005
+  surface: 0.25
+  heightMultipler: 100
+  seed: 10000
   HeightColorGradient:
     serializedVersion: 2
     key0: {r: 0.024296913, g: 0.3962264, b: 0.05884776, a: 1}
@@ -41,10 +48,4 @@ MonoBehaviour:
     m_Mode: 1
     m_NumColorKeys: 3
     m_NumAlphaKeys: 2
-  center: {x: 0, y: 0, z: 0}
-  resolution: {x: 15, y: 15, z: 15}
-  pointSeperation: 35
-  frequency: 0.005
-  surface: 0.25
-  maxHeight: 100
-  seed: 10000
+  resolution: {x: 5, y: 5, z: 5}

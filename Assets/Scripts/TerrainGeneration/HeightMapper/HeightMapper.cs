@@ -16,7 +16,10 @@ namespace TerrainGeneration.Version3
             this.filter = filer;
             this.position = position;
         }
-
+        public IEnumerator Generate(Vector3Int chunk, MeshFilter filter)
+        {
+            return null;
+        }
         public IEnumerator Generate()
         {
             FlatMeshGenerator generator = new FlatMeshGenerator(settings.center, settings.resolution, settings.pointSeperation);
@@ -50,7 +53,7 @@ namespace TerrainGeneration.Version3
             {
                 Vector3 point_with_noise = points[i];
                 point_with_noise.y = PerlinNoise.Noise2D(point_with_noise, settings.frequency, settings.seed);
-                point_with_noise.y *= settings.maxHeight;
+                point_with_noise.y *= settings.heightMultipler;
                 noise[i] = point_with_noise;
             }
             return noise;

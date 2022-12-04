@@ -43,6 +43,16 @@ public class MCCubes
         }
     }
 
+    public IEnumerable<int> MarchEnumerator()
+    {
+        foreach (MCCube cube in cubes)
+        {
+            cube.March();
+            foreach (int i in cube.triangles)
+                yield return i;
+        }
+    }
+
     public int[] March()
     {
         List<int> triangles = new List<int>();
