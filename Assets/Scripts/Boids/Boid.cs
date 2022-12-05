@@ -44,7 +44,7 @@ public class Boid : MonoBehaviour
             else
                 transform.position += transform.forward.normalized * speed * Time.deltaTime;
         } else {
-            turnTowards = Wander() + AvoidBoids() + Align() + (Cohesion() / cohesionFactor);
+            turnTowards = Wander() / 4f + AvoidBoids() * AVoidWallM + Align() * AlignM + (Cohesion() * CohesionM / cohesionFactor);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(turnTowards), TurnSpeed() * Time.deltaTime);
             transform.position += transform.forward.normalized * speed * Time.deltaTime;
         }   
@@ -116,9 +116,12 @@ public class Boid : MonoBehaviour
 
     //Wander so less strict following
     private Vector3 Wander() {
+        /*
         var rand = Random.Range(0, openPaths.Count);
         Debug.DrawRay(transform.position, openPaths[rand].normalized * distance, Color.cyan);
         return openPaths[rand];
+        */
+        return new Vector3(0,0,0.0001f);
     }
 
     //Changes turn speed based on how close the wall is

@@ -12,6 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25fb3578d9668774c8ae13f54d073881, type: 3}
   m_Name: heightMapSettings
   m_EditorClassIdentifier: 
+  frequency: 0.03
+  surface: 0.5
+  heightMultipler: 35
+  seed: 1000
   ColorGradient:
     serializedVersion: 2
     key0: {r: 0, g: 0.4245283, b: 0.0034062031, a: 1}
@@ -41,11 +45,7 @@ MonoBehaviour:
     m_Mode: 1
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
-  center: {x: 0, y: 0, z: 0}
-  chunkDimensions: {x: 8, y: 8, z: 8}
-  pointSeperation: 40
-  chunksInEachDimension: {x: 5, y: 5, z: 5}
-  frequency: 0.003
-  surface: 0.5
-  heightMultipler: 650
-  seed: 1000
+  gridCenter: {x: 0, y: 0, z: 0}
+  cubesPerChunk: {x: 10, y: 10, z: 10}
+  chunksPerGrid: {x: 2, y: 1, z: 2}
+  edgeLen: 4

@@ -13,8 +13,42 @@ namespace TerrainGeneration.Version3
             this.settings = settings;
         }
 
+        public delegate void Complete();
+        public Complete OnGenerationComplete;
+
+        public float minimumPoint = float.MaxValue;
+	public float maximumPoint = float.MinValue;
         public void DrawBounds() { }
-        public void CreateBounds(Material material) { }
+      
+        /*
+         * Creates a shell around the entire play area
+         */
+        public void CreateBounds(Material material)
+        {
+	    float min = minimumPoint;
+            float max = maximumPoint;
+	    max *= 2f;
+            Vector3 center = settings.gridCenter;
+            center.y = (min + max)/2f;
+            Vector3 dimensions = settings.gridDimensions;
+	    dimensions.y = (max - min);
+            
+
+            RectangularPrism cube = new RectangularPrism(center, dimensions);
+            foreach (var pair in cube.getSurfaces())
+            { //creates cube at the specified surface scale in the cube surface
+                GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                var comp = go.transform.GetComponent<MeshRenderer>();
+                comp.material = material;
+                Vector3 scale = pair.scale;
+                if (scale.x == 0) scale.x = 1;
+                if (scale.y == 0) scale.y = 1;
+                if (scale.z == 0) scale.z = 1;
+                go.transform.localScale = scale;
+                go.transform.position = pair.center;
+            }
+        }
+
 
         public IEnumerator Generate(Vector3Int chunk, MeshFilter filter, MeshCollider collider, bool signal = false)
         {
@@ -25,15 +59,24 @@ namespace TerrainGeneration.Version3
 
             Mesh mesh = new Mesh();
             mesh.vertices = vertices;
+            foreach(var v in vertices)
+            {
+                if (v.y < minimumPoint)
+                    minimumPoint = v.y;
+		if (v.y > maximumPoint)
+		    maximumPoint = v.y;
+            }
             mesh.triangles = triangles;
 
-            PostMeshCreation(mesh);
+            PostMeshCreation(mesh, collider);
+
+            if (signal && OnGenerationComplete != null) OnGenerationComplete();
 
             filter.mesh = mesh;
             yield return null;
         }
 
-        private void PostMeshCreation(Mesh mesh)
+        private void PostMeshCreation(Mesh mesh, MeshCollider collider)
         {
             mesh.RecalculateBounds();
             mesh.RecalculateTangents();
@@ -41,6 +84,8 @@ namespace TerrainGeneration.Version3
             mesh.Optimize();
 
             IMeshColorer colorer = new HeightMeshColorer(mesh, settings.ColorGradient);
+
+            collider.sharedMesh = mesh;
             colorer.Color();
         }
 

@@ -34,13 +34,13 @@ using UnityEngine;
  *  Cube defines a cube at its center with a specific height.
  *  Vertices and edges are returned in an array in the above manner.
  */
-public struct Cube
+public struct RectangularPrism
 {
     public Vector3 center;
-    public float height;
-    public Cube(Vector3 center, float height)
+    public Vector3 dimensions;
+    public RectangularPrism(Vector3 center, Vector3 dimensions)
     {
-        this.height = height;
+        this.dimensions = dimensions;
         this.center = center;
     }
 
@@ -50,7 +50,7 @@ public struct Cube
         for (int i = 0; i < 8; i++)
         {
             Vector3 unitPosition = vertexPositions[i];
-            unitPosition *= (height);
+            unitPosition.Scale(dimensions);
             unitPosition += center;
             cubeVertices[i] = unitPosition;
         }
@@ -63,7 +63,7 @@ public struct Cube
         for (int i = 0; i < 12; i++)
         {
             Vector3 unitPosition = edgePosition[i];
-            unitPosition *= (height);
+            unitPosition.Scale(dimensions);
             unitPosition += center;
             edges[i] = unitPosition;
         }
@@ -79,10 +79,10 @@ public struct Cube
             for (int j = 0; j < 4; j++)
             {
                 int vertex = surfaceIndexToVertices[4 * i + j];
-                surfaceCenter += vertexPositions[vertex] * height + center;
+                surfaceCenter += Vector3.Scale(vertexPositions[vertex], dimensions) + center;
             }
             surfaceCenter /= 4f;
-            edges[i] = (surfaceCenter, surfaceDimensions[i]);
+            edges[i] = (surfaceCenter, Vector3.Scale(surfaceDimensions[i], dimensions));
         }
         return edges;
     }

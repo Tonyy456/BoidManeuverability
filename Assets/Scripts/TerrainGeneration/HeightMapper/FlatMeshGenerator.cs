@@ -35,9 +35,9 @@ public class FlatMeshGenerator
     {
         // Generating vertices
         Vector3 start = new Vector3(
-            center.x - resolution.x * pointSeperation / 2,
+            center.x - (resolution.x - 1) * pointSeperation / 2,
             center.y,
-            center.z - resolution.z * pointSeperation / 2
+            center.z - (resolution.z - 1) * pointSeperation / 2
             );
 
         List<Vector3> meshPoints = new List<Vector3>();

@@ -1,5 +1,10 @@
 using UnityEngine;
 
+/*
+ * HeightMeshColorer - 
+ * linearly maps the max height to the max value in the gradient
+ * and the minimum height to the minimum value in the gradient
+ */
 public class HeightMeshColorer : IMeshColorer
 {
     private Mesh mesh;

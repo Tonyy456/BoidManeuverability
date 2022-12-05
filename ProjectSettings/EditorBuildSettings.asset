@@ -9,6 +9,6 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: 66318e8decb5a0c47adaa6eda3668bc0
   - enabled: 1
-    path: Assets/Scenes/TerrainGeneration.unity
+    path: Assets/Scenes/HeightMapper.unity
     guid: 026ffbc5dec4efd42b11bcc2674fd866
   m_configObjects: {}

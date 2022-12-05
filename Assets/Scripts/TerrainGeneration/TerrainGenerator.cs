@@ -24,6 +24,8 @@ namespace TerrainGeneration.Version3
             {
                 case Algorithm.HeightMapper:
                     var map = new HeightMapper(settings);
+                    map.OnGenerationComplete += TranslateMeshesDown;
+                    map.OnGenerationComplete += DrawCubes;
                     algorithm = map;
                     break;
                 case Algorithm.MachingCubes:
@@ -34,7 +36,9 @@ namespace TerrainGeneration.Version3
             }
             StartCoroutine(GenerateTerrain());
         }
-
+        private void TranslateMeshesDown()
+        {
+        }
         private void DrawCubes()
         {
             player.transform.position = spawnPoint;
@@ -53,7 +57,7 @@ namespace TerrainGeneration.Version3
                     {
                         GameObject prefab = Instantiate(chunkMeshPrefab);
                         MeshFilter filter = prefab.GetComponent<MeshFilter>();
-                        prefab.transform.parent = transform;
+                        prefab.transform.parent = meshParent;
                         prefab.name = $"Mesh:{i},{j},{k}";
 
                         Vector3Int chunk = new Vector3Int(i, j, k);

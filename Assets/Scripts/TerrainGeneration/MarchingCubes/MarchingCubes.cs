@@ -4,7 +4,7 @@ using UnityEngine;
 using TerrainGeneration.Version3;
 
 /*
- * Unity script that 
+ * Unity script that executes the marching cubes algorithm
  */
 public class MarchingCubes : ITerrainAlgorithm
 {
@@ -22,11 +22,14 @@ public class MarchingCubes : ITerrainAlgorithm
         this.settings = settings;
     }
 
+    /*
+     * Creates a shell around the entire play area
+     */
     public void CreateBounds(Material material)
     {
         Cube cube = new Cube(settings.gridCenter, settings.gridDimensions.x);
         foreach(var pair in cube.getSurfaces())
-        {
+        { //creates cube at the specified surface scale in the cube surface
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
             var comp = go.transform.GetComponent<MeshRenderer>();
             comp.material = material;
@@ -35,21 +38,17 @@ public class MarchingCubes : ITerrainAlgorithm
             if (scale.y == 0) scale.y = 1;
             if (scale.z == 0) scale.z = 1;
             go.transform.localScale = scale;
-            //Debug.Log(scale);
-            //Debug.Log(pair.scale);
             go.transform.position = pair.center;
         }
     }
 
+    /*
+     * Draws lines around the play area cube.
+     */
     public void DrawBounds()
     {
-        foreach (var graph in graphs)
-        {
-            foreach (var cube in graph.subCubes)
-            {
-                cube.DrawCube(Color.magenta);
-            }
-        }
+        Cube cube = new Cube(settings.gridCenter, settings.gridDimensions.x);
+        cube.DrawCube(Color.magenta);
     }
 
     /*
@@ -74,6 +73,10 @@ public class MarchingCubes : ITerrainAlgorithm
         yield return null;
     }
 
+
+    /*
+     * Creates a mesh for the marching cubes algorithm
+     */
     private Mesh CreateMesh(GridGraph graph, MCCubes marchingCubes)
     {
         Mesh mesh = new Mesh();
@@ -87,6 +90,10 @@ public class MarchingCubes : ITerrainAlgorithm
         mesh.triangles = triangles.ToArray();
         return mesh;
     }
+
+    /*
+     * Optimizes mesh, adds the mesh to the collider and color it
+     */
     private void PostMeshCreation(Mesh mesh, MeshCollider collider)
     {
         mesh.RecalculateBounds();

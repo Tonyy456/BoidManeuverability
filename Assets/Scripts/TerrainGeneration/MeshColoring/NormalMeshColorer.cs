@@ -1,5 +1,10 @@
 using UnityEngine;
 
+/*
+ * NormalMeshColors takes a gradient and based on the mesh normals, it linearly
+ * evaluates the angle between the normal and Vector3.up on the interval
+ * [0,180] and maps it to [0,1] and evaluates it on the gradient.
+ */
 public class NormalMeshColorer : IMeshColorer
 {
     private Mesh mesh;

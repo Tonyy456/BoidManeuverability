@@ -8,18 +8,10 @@ using UnityEngine.UIElements;
 /*
  * A specific graph implementation for a 3d array of points.
  * 
- * vertices are created as vector3 positions in space
+ * all vertices and edges can be obtained from the definition of the cube.
  * 
- * edges are created as midpoints between vertices represented as vector3.
- * edges are seperated into a list based on what axis they are parallel to.
- * the size of each list is the same as the resolution but one less in the 
- * dimension that edge is parallel to.
- * 
- * potential code refactoring idea for the edges to make the code shorter
- * and simpiler is to create a dictionary based on what axis the edge is parallel
- * to and then the corresponding Vector3Int index. See below
- * 
- * public Dictionary<(int axis, Vector3 index), Vector3> edges = new Dictionary<(int, Vector3), Vector3>();
+ * meshVertices is used for creating a mesh so you know exactly what index
+ * to map a triangle edge to.
  */
 public class GridGraph
 {
@@ -30,16 +22,15 @@ public class GridGraph
     private Vector3 graphCenter;
     private float seperation;
     private Vector3 graphSize;
-    public Vector3Int resolution { get; set; }
 
-    //define all vertices and edges
+    public Vector3Int resolution { get; set; } //points in each dimension
     public Cube[,,] subCubes;
 
     private Dictionary<Vector3, int> meshVertices = new Dictionary<Vector3, int>();
     private int numVertices = 0;
     public GridGraph(Vector3 graphCenter, Vector3Int res,  float seperation)
     {
-        resolution = res;
+        this.resolution = res;
         this.graphCenter = graphCenter;
         this.seperation = seperation;
 
@@ -49,13 +40,11 @@ public class GridGraph
         corner = negCorner;
 
         GenerateCubes();
-
     }
 
     private void GenerateCubes()
     {
         Vector3 center000 = corner + cubeSize / 2f;
-        //Vector3 center000 = new Vector3();
         Vector3Int dim = new Vector3Int(resolution.x - 1, resolution.y - 1, resolution.z - 1);
         subCubes = new Cube[dim.x, dim.y, dim.z];
         for (int x = 0; x < dim.x; x++)
@@ -107,7 +96,4 @@ public class GridGraph
         }
         throw new System.Exception("Edge is unknown in a cube");
     }
-
-    public List<Vector3> getEdges() => throw new System.NotImplementedException();
-    public List<Vertex> getVertices() => throw new System.NotImplementedException();
 }

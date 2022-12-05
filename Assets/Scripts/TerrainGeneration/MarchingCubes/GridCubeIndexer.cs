@@ -21,26 +21,16 @@ public class GridCubeIndexer
         this.graph = graph;
     }
 
-    /*
-     * Get the vertices for a cube at index x,y,z
-     * where 0,0,0 is the cube furthest in the negative x,y,z direction.
-     */
     public Vector3[] getVerticesForCube(int x, int y, int z)
     {
         return graph.subCubes[x,y,z].getVerticesForCube();
     }
 
-    /*
-     * Get the edges in a list in the correct way defined at the top of this file.
-     */
     public Vector3[] getEdgesForCube(int x, int y, int z)
     {
         return graph.subCubes[x,y,z].getEdgesForCube();
     }
 
-    /*
-     * Get the mesh indices for each edge in a parallel array.
-     */
     public int[] getEdgeIndices(Vector3[] edges)
     {
         List<int> indicies = new List<int>();
