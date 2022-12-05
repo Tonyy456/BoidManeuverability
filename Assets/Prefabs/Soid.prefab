@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6667150202401915029}
   m_Layer: 0
   m_Name: Soid
-  m_TagString: Untagged
+  m_TagString: Soid
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -113,22 +113,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   closeBoids: []
   openPaths: []
-  speed: 7
-  baseRotSpeed: 30
+  speed: 15
+  baseRotSpeed: 45
+  maxRotSpeed: 90
   resolution: 375
-  distance: 5
-  cohesionFactor: 0.5
-  reactionDist: 2
-  leader: 0
-  avoid: 0
-  align: 0
-  cohesion: 0
-  xMin: 1
-  xMax: 10
-  yMin: 1
-  yMax: 49
-  zMin: 1
-  zMax: 49
+  distance: 10
+  cohesionFactor: 100
+  avoidCollisionWeight: 2
 --- !u!1 &9147864278995668079
 GameObject:
   m_ObjectHideFlags: 0
