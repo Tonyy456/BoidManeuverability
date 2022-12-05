@@ -37,7 +37,7 @@ namespace TerrainGeneration.Version3
 
         private void DrawCubes()
         {
-            player.position = spawnPoint;
+            player.transform.position = spawnPoint;
             algorithm.CreateBounds(boundsMaterial);
         }
 
