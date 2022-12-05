@@ -117,7 +117,7 @@ MonoBehaviour:
   baseRotSpeed: 45
   maxRotSpeed: 90
   resolution: 375
-  distance: 15
+  distance: 10
   cohesionFactor: 100
   avoidCollisionWeight: 2
 --- !u!1 &9147864278995668079

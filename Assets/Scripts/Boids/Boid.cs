@@ -14,7 +14,7 @@ public class Boid : MonoBehaviour
     public float baseRotSpeed = 15f;
     public float maxRotSpeed = 90f;
     public int resolution = 375;
-    public float distance = 5f;
+    public float distance = 10f;
     public float cohesionFactor = 1f;
     public float avoidCollisionWeight = 2f;
 
@@ -30,17 +30,19 @@ public class Boid : MonoBehaviour
         obstructedPaths = bv.Hits;
 
         //Rotations
-        turnTowards = AvoidWalls() + AvoidBoids() + Align() + Cohesion();
-
-        float rotSpeed = TurnSpeed();
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(turnTowards), rotSpeed * Time.deltaTime);
-
-        //Positions
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.forward, out hit, distance))
-            transform.position += transform.forward.normalized * (speed  / (distance / hit.distance)) * Time.deltaTime;
-        else
+        if (Physics.Raycast(transform.position, transform.forward, out hit, distance)) {
+            turnTowards = AvoidWalls() + AvoidBoids() + Align() + (Cohesion() / cohesionFactor);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(turnTowards), TurnSpeed() * Time.deltaTime);
+            if (hit.collider.tag != "Soid")
+                transform.position += transform.forward.normalized * (speed * (hit.distance / (distance * 1.5f))) * Time.deltaTime;
+            else
+                transform.position += transform.forward.normalized * speed * Time.deltaTime;
+        } else {
+            turnTowards = Wander() + AvoidBoids() + Align() + (Cohesion() / cohesionFactor);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(turnTowards), TurnSpeed() * Time.deltaTime);
             transform.position += transform.forward.normalized * speed * Time.deltaTime;
+        }   
     }
 
     //Avoid other close boids
@@ -55,20 +57,23 @@ public class Boid : MonoBehaviour
         }
         turnDir.Normalize();
 
-        Debug.DrawRay(transform.position, turnDir * 5f, Color.green);
+        Debug.DrawRay(transform.position, turnDir * distance, Color.green);
 
         return turnDir;
     }
 
     //Avoid walls and obstacles
     private Vector3 AvoidWalls() {
-        Vector3 bestPath = openPaths[0];
+        Vector3 bestPath = transform.forward;
+        if (openPaths.Count > 0) {
+            bestPath = openPaths[0];
 
-        //Avoid walls
-        foreach (Vector3 v in openPaths) {
-            bestPath = Vector3.Distance(v, transform.forward) < Vector3.Distance(bestPath, transform.forward) ? v : bestPath;
+            //Avoid walls
+            foreach (Vector3 v in openPaths) {
+                bestPath = Vector3.Distance(v, transform.forward) < Vector3.Distance(bestPath, transform.forward) ? v : bestPath;
+            }
+            Debug.DrawRay(transform.position, bestPath.normalized * distance, Color.cyan);
         }
-        Debug.DrawRay(transform.position, bestPath.normalized * 5f, Color.cyan);
 
         return bestPath;
     }
@@ -83,7 +88,7 @@ public class Boid : MonoBehaviour
 
         if (closeBoids.Count > 0)
             turnDir /= closeBoids.Count;
-        Debug.DrawRay(transform.position, turnDir * 5f, Color.red);
+        Debug.DrawRay(transform.position, turnDir * distance, Color.red);
 
         return turnDir;
     }
@@ -99,9 +104,16 @@ public class Boid : MonoBehaviour
             avgPos /= closeBoids.Count;
         }
 
-        Debug.DrawRay(transform.position, (avgPos - transform.position).normalized * 5f, Color.blue);
+        Debug.DrawRay(transform.position, (avgPos - transform.position).normalized * distance, Color.blue);
 
         return avgPos - transform.position;
+    }
+
+    //Wander so less strict following
+    private Vector3 Wander() {
+        var rand = Random.Range(0, openPaths.Count);
+        Debug.DrawRay(transform.position, openPaths[rand].normalized * distance, Color.cyan);
+        return openPaths[rand];
     }
 
     //Changes turn speed based on how close the wall is

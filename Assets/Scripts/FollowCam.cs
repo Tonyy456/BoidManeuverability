@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class FollowCam : MonoBehaviour
 {
-    [SerializeField] Transform target;
-    [SerializeField] float distanceAway;
-    [SerializeField] Vector3 offset;
+    private Transform target;
+    [SerializeField] private float distanceAway;
+    [SerializeField] private Vector3 offset;
+    [SerializeField] private float lookTime;
 
     // Update is called once per frame
     void LateUpdate()
@@ -14,7 +15,7 @@ public class FollowCam : MonoBehaviour
         if (!target)
             FindTarget();
         transform.position = target.position;
-        transform.rotation = target.rotation;
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, target.rotation, lookTime);
     }
 
     void FindTarget() {
