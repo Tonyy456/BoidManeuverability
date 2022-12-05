@@ -2,9 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//Written By: Taylor Liu
-//Sources: In class boids lecture slides
-//         https://youtu.be/bqtqltqcQhw
 public class Boid : MonoBehaviour
 {
     [Header("Other boids and paths")]

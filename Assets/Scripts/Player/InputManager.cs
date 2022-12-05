@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//Written By: Taylor Liu
-//Took from Lab3
 public class InputManager : MonoBehaviour
 {
     [SerializeField] private MoveController moveController;

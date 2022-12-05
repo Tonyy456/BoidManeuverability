@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-//Written By: Taylor Liu
 public class ToggleCamera : MonoBehaviour
 {
     [SerializeField] List<Camera> cams;

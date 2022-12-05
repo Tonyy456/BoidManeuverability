@@ -1,8 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-//Written By: Taylor Liu
-//Took from Lab3
 public class LookController : MonoBehaviour {
 
     [SerializeField] public Transform target;
