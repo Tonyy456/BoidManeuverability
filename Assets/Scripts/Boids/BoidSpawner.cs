@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//Written By: Taylor Liu
 public class BoidSpawner : MonoBehaviour
 {
     public List<Vector3> spawnPoints;

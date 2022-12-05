@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+//Written By: Taylor Liu
+//Took from Lab3
 public class MoveController : MonoBehaviour {
     [SerializeField] public Transform targetToMove;
     private Transform targetMoveTowards;
@@ -42,7 +44,8 @@ public class MoveController : MonoBehaviour {
     private void Jump(InputAction.CallbackContext e) {
         targetMoveTowards.position = jumpHeight * targetToMove.up;
 
-        targetToMove.GetComponent<Rigidbody>().AddForce(targetMoveTowards.position);
+        if (Physics.Raycast(targetToMove.position, targetToMove.up * -1, 1f))
+            targetToMove.GetComponent<Rigidbody>().AddForce(targetMoveTowards.position);
     }
 
     //Movees the player at every fixed update towards the direction that the keyboard indicates
