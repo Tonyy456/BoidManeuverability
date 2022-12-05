@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//Written By: Taylor Liu
 public class FollowCam : MonoBehaviour
 {
     private Transform target;

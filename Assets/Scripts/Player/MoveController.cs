@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+//Written By: Taylor Liu
+//Took from Lab3
 public class MoveController : MonoBehaviour {
     [SerializeField] public Transform targetToMove;
     private Transform targetMoveTowards;
