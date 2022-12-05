@@ -25,47 +25,38 @@ public class GridGraph
 {
 
     //define variables related to the space this graph takes
-    private Vector3 startPoint; //the point furthest in the negative direction
-    private Vector3 center { get; set; }
-    private float pointSeperation { get; set; }
-    private Vector3 size { get; set; }
-    public Vector3Int Resolution { get; set; }
+    private Vector3 corner;
+    private Vector3 cubeSize;
+    private Vector3 graphCenter;
+    private float seperation;
+    private Vector3 graphSize;
+    public Vector3Int resolution { get; set; }
 
     //define all vertices and edges
     public Cube[,,] subCubes;
-    public Vector3[,,] vertices { get; set; }
-    public Vector3[,,] Xparallel { get; set; }
-    public Vector3[,,] Yparallel { get; set; }
-    public Vector3[,,] Zparallel { get; set; }
 
-    private Dictionary<Vector3, int> meshIndex;
-    private int meshVertexCount = 0;
-
+    private Dictionary<Vector3, int> meshVertices = new Dictionary<Vector3, int>();
+    private int numVertices = 0;
     public GridGraph(Vector3 graphCenter, Vector3Int res,  float seperation)
     {
-        Resolution = res;
-        center = graphCenter;
-        pointSeperation = seperation;
-        size = new Vector3(
-            (res.x - 1) * seperation,
-            (res.y - 1) * seperation,
-            (res.z - 1) * seperation);
-        startPoint = new Vector3(
-            -size.x / 2 + graphCenter.x,
-            -size.y / 2 + graphCenter.y,
-            -size.z / 2 + graphCenter.z);
+        resolution = res;
+        this.graphCenter = graphCenter;
+        this.seperation = seperation;
+
+        Vector3 negCorner = -1 * (((Vector3)res - new Vector3(1, 1, 1)) * (seperation / 2f));
+        negCorner += this.graphCenter;
+        cubeSize = new Vector3(seperation, seperation, seperation);
+        corner = negCorner;
 
         GenerateCubes();
-        GenerateVertices();
-        GenerateEdges();
+
     }
 
     private void GenerateCubes()
     {
-        Vector3 cubeDim = new Vector3(pointSeperation, pointSeperation, pointSeperation);
-        Vector3 center000 = startPoint + cubeDim / 2f;
-
-        Vector3Int dim = new Vector3Int(Resolution.x - 1, Resolution.y - 1, Resolution.z - 1);
+        Vector3 center000 = corner + cubeSize / 2f;
+        //Vector3 center000 = new Vector3();
+        Vector3Int dim = new Vector3Int(resolution.x - 1, resolution.y - 1, resolution.z - 1);
         subCubes = new Cube[dim.x, dim.y, dim.z];
         for (int x = 0; x < dim.x; x++)
         {
@@ -74,85 +65,21 @@ public class GridGraph
                 for (int z = 0; z < dim.z; z++)
                 {
                     Vector3 center = center000;
-                    center += (Vector3.Scale(new Vector3(x, y, z), cubeDim));
-                    float height = pointSeperation;
+                    center += (Vector3.Scale(new Vector3(x, y, z), cubeSize));
+                    float height = seperation;
                     subCubes[x, y, z] = new Cube(center, height);
                 }
             }
         }
-    }
 
-    /*
-     * Generates the vertices
-     */
-    private void GenerateVertices()
-    {
-        vertices = new Vector3[Resolution.x, Resolution.y, Resolution.z];
-        for (int x = 0; x < Resolution.x; x++) {
-            for (int y = 0; y < Resolution.y; y++) {
-                for (int z = 0; z < Resolution.z; z++) {
-                    Vector3 vertexPosition = new Vector3(
-                        startPoint.x + pointSeperation * x, 
-                        startPoint.y + pointSeperation * y, 
-                        startPoint.z + pointSeperation * z
-                        );
-                    vertices[x, y, z] = vertexPosition;
-                }
+        foreach (Cube c in subCubes)
+        {
+            foreach(Vector3 edge in c.getEdgesForCube())
+            {
+                if (meshVertices.ContainsKey(edge)) continue;
+                meshVertices.Add(edge, numVertices++);
             }
         }
-    }
-
-    /*
-     * Fills edges into 3d arrays. 
-     * 
-     * Triple for loop for each array because dimensions are of each array 
-     * are different. Edge defined as the midpoint between the two vertices.
-     * 
-     * Dictionary created so each edge point is assigned a unique index.
-     */
-    private void GenerateEdges()
-    {
-        if (vertices == null) throw new System.Exception("Generating edges before vertices generated");
-
-        meshIndex = new Dictionary<Vector3, int>();
-        Xparallel = new Vector3[Resolution.x - 1, Resolution.y, Resolution.z];
-        Yparallel = new Vector3[Resolution.x, Resolution.y - 1, Resolution.z];
-        Zparallel = new Vector3[Resolution.x, Resolution.y, Resolution.z - 1];
-        int index = 0;
-
-        //create x parallel edges
-        for (int x = 0; x < Resolution.x - 1; x++) {
-            for (int y = 0; y < Resolution.y; y++) {
-                for (int z = 0; z < Resolution.z; z++) {
-                    Vector3 position = ((vertices[x, y, z] + vertices[x + 1, y, z]) / 2f);
-                    Xparallel[x, y, z] = position;
-                    meshIndex.Add(position, index++);
-                }
-            }
-        }
-
-        //create y parallel edges
-        for (int x = 0; x < Resolution.x; x++)  {
-            for (int y = 0; y < Resolution.y - 1; y++) {
-                for (int z = 0; z < Resolution.z; z++) {
-                    Vector3 position = ((vertices[x, y, z] + vertices[x, y + 1, z]) / 2f);
-                    Yparallel[x, y, z] = position;
-                    meshIndex.Add(position, index++);
-                }
-            }
-        }
-
-        //Create z parallel edges
-        for (int x = 0; x < Resolution.x; x++)  {
-            for (int y = 0; y < Resolution.y; y++) {
-                for (int z = 0; z < Resolution.z - 1; z++) {
-                    Vector3 position = ((vertices[x, y, z] + vertices[x, y, z + 1]) / 2f);
-                    Zparallel[x, y, z] = position;
-                    meshIndex.Add(position, index++);
-                }
-            }
-        }
-        meshVertexCount = index;
     }
 
     /*
@@ -161,9 +88,11 @@ public class GridGraph
      */
     public Vector3[] GetMeshIndicies()
     {
-        Vector3[] vertices = new Vector3[meshVertexCount];
-        foreach(var pair in meshIndex)
+        Vector3[] vertices = new Vector3[numVertices];
+        foreach(var pair in meshVertices)
+        {
             vertices[pair.Value] = pair.Key;
+        }
         return vertices;
     }
 
@@ -172,33 +101,11 @@ public class GridGraph
      */
     public int GetMeshIndex(Vector3 edgePosition)
     {
-        if(meshIndex.TryGetValue(edgePosition, out var index))
+        if(meshVertices.TryGetValue(edgePosition, out var index))
         { 
             return index;
         }
         throw new System.Exception("Edge is unknown in a cube");
-    }
-
-    /*
-     * Draws the bounds of the entire grid for one frame.
-     */
-    public void DrawBounds(Color c)
-    {
-        Debug.DrawLine(vertices[0, 0, 0], vertices[0, Resolution.y - 1, 0], c ,0.01f);
-        Debug.DrawLine(vertices[0, 0, 0], vertices[Resolution.x - 1, 0, 0], c, 0.01f);
-        Debug.DrawLine(vertices[0, 0, 0], vertices[0, 0, Resolution.z - 1], c, 0.01f);
-
-        Debug.DrawLine(vertices[Resolution.x - 1, 0, Resolution.z - 1], vertices[0, 0, Resolution.z - 1], c, 0.01f);
-        Debug.DrawLine(vertices[Resolution.x - 1, 0, Resolution.z - 1], vertices[Resolution.x - 1, Resolution.y - 1, Resolution.z - 1], c, 0.01f);
-        Debug.DrawLine(vertices[Resolution.x - 1, 0, Resolution.z - 1], vertices[Resolution.x - 1, 0, 0], c, 0.01f);
-
-        Debug.DrawLine(vertices[0, Resolution.y - 1, Resolution.z - 1], vertices[Resolution.x - 1, Resolution.y - 1, Resolution.z - 1], c, 0.01f);
-        Debug.DrawLine(vertices[0, Resolution.y - 1, Resolution.z - 1], vertices[0, 0, Resolution.z - 1], c, 0.01f);
-        Debug.DrawLine(vertices[0, Resolution.y - 1, Resolution.z - 1], vertices[0, Resolution.y - 1, 0], c, 0.01f);
-
-        Debug.DrawLine(vertices[Resolution.x - 1, Resolution.y - 1, 0], vertices[0, Resolution.y - 1, 0], c, 0.01f);
-        Debug.DrawLine(vertices[Resolution.x - 1, Resolution.y - 1, 0], vertices[Resolution.x - 1, 0, 0], c, 0.01f);
-        Debug.DrawLine(vertices[Resolution.x - 1, Resolution.y - 1, 0], vertices[Resolution.x - 1, Resolution.y - 1, Resolution.z - 1], c, 0.01f);
     }
 
     public List<Vector3> getEdges() => throw new System.NotImplementedException();

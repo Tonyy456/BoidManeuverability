@@ -9,7 +9,7 @@ public class MCCubes
 {
     private VertexStatusGenerator generator;
     public GridGraph graph { get; set; }
-    private Vector3Int graphSize { get => graph.Resolution; }
+    private Vector3Int graphSize { get => graph.resolution; }
     public Vector3Int cubeCount { get; set; }
 
     MCCube[,,] cubes;

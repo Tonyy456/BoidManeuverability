@@ -11,6 +11,9 @@ public class MarchingCubes : ITerrainAlgorithm
     private GenerationSettings settings;
     private List<GridGraph> graphs = new List<GridGraph>();
 
+    public delegate void Complete();
+    public Complete OnGenerationComplete;
+
     /*
      * Constructor
      */
@@ -19,20 +22,60 @@ public class MarchingCubes : ITerrainAlgorithm
         this.settings = settings;
     }
 
-    /*
- * Generate is used for a coroutine that will create the entire mesh.
- * 
- * Using this kind of interface allows me to yield return if I want to save
- * processing power during the initial creation.
- *  
- */
-    public IEnumerator Generate(Vector3Int chunk, MeshFilter filter)
+    public void CreateBounds(Material material)
     {
-        GridGraph graph = new GridGraph(settings.chunkCenter(chunk), settings.chunkDimensions, settings.pointSeperation);
-        graphs.Add(graph);
+        Cube cube = new Cube(settings.gridCenter, settings.gridDimensions.x);
+        foreach(var pair in cube.getSurfaces())
+        {
+            GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            var comp = go.transform.GetComponent<MeshRenderer>();
+            comp.material = material;
+            Vector3 scale = Vector3.Scale(pair.scale, settings.gridDimensions);
+            if (scale.x == 0) scale.x = 1;
+            if (scale.y == 0) scale.y = 1;
+            if (scale.z == 0) scale.z = 1;
+            go.transform.localScale = scale;
+            Debug.Log(scale);
+            Debug.Log(pair.scale);
+            go.transform.position = pair.center;
+        }
+    }
+
+    public void DrawBounds()
+    {
+        foreach (var graph in graphs)
+        {
+            foreach (var cube in graph.subCubes)
+            {
+                cube.DrawCube(Color.magenta);
+            }
+        }
+    }
+
+    /*
+     * Generate is used for a coroutine that will create the entire mesh.
+     * 
+     * Using this kind of interface allows me to yield return if I want to save
+     * processing power during the initial creation.
+     */
+    public IEnumerator Generate(Vector3Int chunk, MeshFilter filter, bool signal = false)
+    {
+        GridGraph graph = new GridGraph(settings.chunkCenter(chunk), settings.resolution, settings.edgeLen);
         NoiseStatusGenerator generator = new NoiseStatusGenerator(graph, settings.frequency, settings.surface, settings.seed);
         MCCubes marchingCubes = new MCCubes(graph, generator);
+        graphs.Add(graph);
 
+        Mesh mesh = CreateMesh(graph, marchingCubes);
+        PostMeshCreation(mesh);
+        filter.mesh = mesh;
+
+        if (signal && OnGenerationComplete != null) OnGenerationComplete();
+
+        yield return null;
+    }
+
+    private Mesh CreateMesh(GridGraph graph, MCCubes marchingCubes)
+    {
         Mesh mesh = new Mesh();
         mesh.vertices = graph.GetMeshIndicies();
 
@@ -42,9 +85,10 @@ public class MarchingCubes : ITerrainAlgorithm
             triangles.Add(i);
         }
         mesh.triangles = triangles.ToArray();
-
-        yield return new WaitForFixedUpdate();
-
+        return mesh;
+    }
+    private void PostMeshCreation(Mesh mesh)
+    {
         mesh.RecalculateBounds();
         mesh.RecalculateTangents();
         mesh.RecalculateNormals();
@@ -52,19 +96,5 @@ public class MarchingCubes : ITerrainAlgorithm
 
         IMeshColorer colorer = new NormalMeshColorer(mesh, settings.ColorGradient);
         colorer.Color();
-
-        filter.mesh = mesh;
-
-        yield return null;
-    }
-
-
-
-    public void DrawBounds()
-    {
-        foreach (GridGraph graph in graphs)
-        {
-            graph.DrawBounds(Color.magenta);
-        }
     }
 }

@@ -7,18 +7,18 @@ namespace TerrainGeneration.Version3
 {
     public class HeightMapper : ITerrainAlgorithm
     {
-        private MeshFilter filter;
         private GenerationSettings settings;
-        private Vector3 position;
-        public HeightMapper(GenerationSettings settings, MeshFilter filer, Vector3 position)
+        public HeightMapper(GenerationSettings settings)
         {
             this.settings = settings;
-            this.filter = filer;
-            this.position = position;
         }
-        public IEnumerator Generate(Vector3Int chunk, MeshFilter filter)
+
+        public void DrawBounds() { }
+        public void CreateBounds(Material material) { }
+
+        public IEnumerator Generate(Vector3Int chunk, MeshFilter filter, bool signal = false)
         {
-            FlatMeshGenerator generator = new FlatMeshGenerator(settings.center, settings.chunkDimensions, settings.pointSeperation);
+            FlatMeshGenerator generator = new FlatMeshGenerator(settings.chunkCenter(chunk), settings.cubesPerChunk + new Vector3Int(1,1,1), settings.edgeLen);
             var definition = generator.getMeshDefintion();
             Vector3[] vertices = addNoise(definition.vertices);
             int[] triangles = definition.triangles;
@@ -26,6 +26,15 @@ namespace TerrainGeneration.Version3
             Mesh mesh = new Mesh();
             mesh.vertices = vertices;
             mesh.triangles = triangles;
+
+            PostMeshCreation(mesh);
+
+            filter.mesh = mesh;
+            yield return null;
+        }
+
+        private void PostMeshCreation(Mesh mesh)
+        {
             mesh.RecalculateBounds();
             mesh.RecalculateTangents();
             mesh.RecalculateNormals();
@@ -33,14 +42,6 @@ namespace TerrainGeneration.Version3
 
             IMeshColorer colorer = new HeightMeshColorer(mesh, settings.ColorGradient);
             colorer.Color();
-
-            filter.mesh = mesh;
-            yield return null;
-        }
-
-        public void DrawBounds()
-        {
-
         }
 
         private Vector3[] addNoise(Vector3[] points)
