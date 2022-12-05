@@ -116,10 +116,14 @@ MonoBehaviour:
   speed: 15
   baseRotSpeed: 45
   maxRotSpeed: 90
-  resolution: 375
+  resolution: 150
   distance: 10
   cohesionFactor: 100
   avoidCollisionWeight: 2
+  AlignM: 4
+  AvoidM: 1
+  AVoidWallM: 1
+  CohesionM: 4
 --- !u!1 &9147864278995668079
 GameObject:
   m_ObjectHideFlags: 0

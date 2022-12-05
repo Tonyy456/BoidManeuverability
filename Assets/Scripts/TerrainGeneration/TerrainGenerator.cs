@@ -59,9 +59,9 @@ namespace TerrainGeneration.Version3
                         Vector3Int chunk = new Vector3Int(i, j, k);
                         IEnumerator enumer;
                         if (i == dim.x - 1 && j == dim.y - 1 && k == dim.z - 1)
-                             enumer = algorithm.Generate(chunk, filter, true);
+                             enumer = algorithm.Generate(chunk, filter, prefab.GetComponent<MeshCollider>(), true);
                         else 
-                            enumer = algorithm.Generate(chunk, filter);
+                            enumer = algorithm.Generate(chunk, filter, prefab.GetComponent<MeshCollider>());
                         StartCoroutine(enumer);
 
                         yield return new WaitForSeconds(delay);

@@ -18,6 +18,11 @@ public class Boid : MonoBehaviour
     public float cohesionFactor = 1f;
     public float avoidCollisionWeight = 2f;
 
+    [SerializeField] private float AlignM = 2f;
+    [SerializeField] private float AvoidM = 2f;
+    [SerializeField] private float AVoidWallM = 2f;
+    [SerializeField] private float CohesionM = 2f;
+
     private Vector3 turnTowards;
 
     private void Update() {
@@ -32,7 +37,7 @@ public class Boid : MonoBehaviour
         //Rotations
         RaycastHit hit;
         if (Physics.Raycast(transform.position, transform.forward, out hit, distance)) {
-            turnTowards = AvoidWalls() + AvoidBoids() + Align() + (Cohesion() / cohesionFactor);
+            turnTowards = AvoidWalls() * AVoidWallM + AvoidBoids() * AvoidM + Align() * AlignM + (Cohesion() * CohesionM  / cohesionFactor);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(turnTowards), TurnSpeed() * Time.deltaTime);
             if (hit.collider.tag != "Soid")
                 transform.position += transform.forward.normalized * (speed * (hit.distance / (distance * 1.5f))) * Time.deltaTime;

@@ -58,7 +58,7 @@ public class MarchingCubes : ITerrainAlgorithm
      * Using this kind of interface allows me to yield return if I want to save
      * processing power during the initial creation.
      */
-    public IEnumerator Generate(Vector3Int chunk, MeshFilter filter, bool signal = false)
+    public IEnumerator Generate(Vector3Int chunk, MeshFilter filter, MeshCollider collider, bool signal = false)
     {
         GridGraph graph = new GridGraph(settings.chunkCenter(chunk), settings.resolution, settings.edgeLen);
         NoiseStatusGenerator generator = new NoiseStatusGenerator(graph, settings.frequency, settings.surface, settings.seed);
@@ -66,7 +66,7 @@ public class MarchingCubes : ITerrainAlgorithm
         graphs.Add(graph);
 
         Mesh mesh = CreateMesh(graph, marchingCubes);
-        PostMeshCreation(mesh);
+        PostMeshCreation(mesh, collider);
         filter.mesh = mesh;
 
         if (signal && OnGenerationComplete != null) OnGenerationComplete();
@@ -87,12 +87,14 @@ public class MarchingCubes : ITerrainAlgorithm
         mesh.triangles = triangles.ToArray();
         return mesh;
     }
-    private void PostMeshCreation(Mesh mesh)
+    private void PostMeshCreation(Mesh mesh, MeshCollider collider)
     {
         mesh.RecalculateBounds();
         mesh.RecalculateTangents();
         mesh.RecalculateNormals();
         mesh.Optimize();
+
+        collider.sharedMesh = mesh;
 
         IMeshColorer colorer = new NormalMeshColorer(mesh, settings.ColorGradient);
         colorer.Color();

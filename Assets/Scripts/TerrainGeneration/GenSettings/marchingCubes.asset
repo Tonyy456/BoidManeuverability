@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25fb3578d9668774c8ae13f54d073881, type: 3}
   m_Name: marchingCubes
   m_EditorClassIdentifier: 
-  frequency: 0.1
+  frequency: 0.05
   surface: 0.25
   heightMultipler: 100
   seed: 10000
@@ -48,4 +48,4 @@ MonoBehaviour:
   gridCenter: {x: 0, y: 0, z: 0}
   cubesPerChunk: {x: 10, y: 10, z: 10}
   chunksPerGrid: {x: 2, y: 2, z: 2}
-  edgeLen: 1
+  edgeLen: 3

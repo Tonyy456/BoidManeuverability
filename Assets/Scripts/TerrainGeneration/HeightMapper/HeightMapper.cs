@@ -16,7 +16,7 @@ namespace TerrainGeneration.Version3
         public void DrawBounds() { }
         public void CreateBounds(Material material) { }
 
-        public IEnumerator Generate(Vector3Int chunk, MeshFilter filter, bool signal = false)
+        public IEnumerator Generate(Vector3Int chunk, MeshFilter filter, MeshCollider collider, bool signal = false)
         {
             FlatMeshGenerator generator = new FlatMeshGenerator(settings.chunkCenter(chunk), settings.cubesPerChunk + new Vector3Int(1,1,1), settings.edgeLen);
             var definition = generator.getMeshDefintion();
