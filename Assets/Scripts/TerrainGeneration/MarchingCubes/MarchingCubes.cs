@@ -35,8 +35,8 @@ public class MarchingCubes : ITerrainAlgorithm
             if (scale.y == 0) scale.y = 1;
             if (scale.z == 0) scale.z = 1;
             go.transform.localScale = scale;
-            Debug.Log(scale);
-            Debug.Log(pair.scale);
+            //Debug.Log(scale);
+            //Debug.Log(pair.scale);
             go.transform.position = pair.center;
         }
     }

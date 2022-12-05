@@ -62,6 +62,15 @@ public partial class @Player : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""ToggleCamera"",
+                    ""type"": ""Button"",
+                    ""id"": ""b8ef8e04-acb4-4165-83a1-64fe8dd4d8ca"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -262,6 +271,17 @@ public partial class @Player : IInputActionCollection2, IDisposable
                     ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""65611e10-48d7-4bc6-bf55-2368ec86aa74"",
+                    ""path"": ""<Keyboard>/p"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleCamera"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -274,6 +294,7 @@ public partial class @Player : IInputActionCollection2, IDisposable
         m_PlayerControls_Look = m_PlayerControls.FindAction("Look", throwIfNotFound: true);
         m_PlayerControls_Sprint = m_PlayerControls.FindAction("Sprint", throwIfNotFound: true);
         m_PlayerControls_Jump = m_PlayerControls.FindAction("Jump", throwIfNotFound: true);
+        m_PlayerControls_ToggleCamera = m_PlayerControls.FindAction("ToggleCamera", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -337,6 +358,7 @@ public partial class @Player : IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerControls_Look;
     private readonly InputAction m_PlayerControls_Sprint;
     private readonly InputAction m_PlayerControls_Jump;
+    private readonly InputAction m_PlayerControls_ToggleCamera;
     public struct PlayerControlsActions
     {
         private @Player m_Wrapper;
@@ -345,6 +367,7 @@ public partial class @Player : IInputActionCollection2, IDisposable
         public InputAction @Look => m_Wrapper.m_PlayerControls_Look;
         public InputAction @Sprint => m_Wrapper.m_PlayerControls_Sprint;
         public InputAction @Jump => m_Wrapper.m_PlayerControls_Jump;
+        public InputAction @ToggleCamera => m_Wrapper.m_PlayerControls_ToggleCamera;
         public InputActionMap Get() { return m_Wrapper.m_PlayerControls; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -366,6 +389,9 @@ public partial class @Player : IInputActionCollection2, IDisposable
                 @Jump.started -= m_Wrapper.m_PlayerControlsActionsCallbackInterface.OnJump;
                 @Jump.performed -= m_Wrapper.m_PlayerControlsActionsCallbackInterface.OnJump;
                 @Jump.canceled -= m_Wrapper.m_PlayerControlsActionsCallbackInterface.OnJump;
+                @ToggleCamera.started -= m_Wrapper.m_PlayerControlsActionsCallbackInterface.OnToggleCamera;
+                @ToggleCamera.performed -= m_Wrapper.m_PlayerControlsActionsCallbackInterface.OnToggleCamera;
+                @ToggleCamera.canceled -= m_Wrapper.m_PlayerControlsActionsCallbackInterface.OnToggleCamera;
             }
             m_Wrapper.m_PlayerControlsActionsCallbackInterface = instance;
             if (instance != null)
@@ -382,6 +408,9 @@ public partial class @Player : IInputActionCollection2, IDisposable
                 @Jump.started += instance.OnJump;
                 @Jump.performed += instance.OnJump;
                 @Jump.canceled += instance.OnJump;
+                @ToggleCamera.started += instance.OnToggleCamera;
+                @ToggleCamera.performed += instance.OnToggleCamera;
+                @ToggleCamera.canceled += instance.OnToggleCamera;
             }
         }
     }
@@ -392,5 +421,6 @@ public partial class @Player : IInputActionCollection2, IDisposable
         void OnLook(InputAction.CallbackContext context);
         void OnSprint(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
+        void OnToggleCamera(InputAction.CallbackContext context);
     }
 }
