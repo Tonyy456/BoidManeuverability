@@ -12,9 +12,12 @@ public class BoidSpawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        GameObject boidParent = new GameObject();
+        boidParent.name = "boids";
         for (int i = 0; i < boidNum; i++) {
             GameObject one = Instantiate(boid);
             one.transform.position = spawnPoints[i % spawnPoints.Count];
+            one.transform.parent = boidParent.transform;
         }
     }
 }
