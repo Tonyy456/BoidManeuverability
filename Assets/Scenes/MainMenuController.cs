@@ -4,8 +4,13 @@ using UnityEngine;
 
 public class MainMenuController : MonoBehaviour
 {
-    public void StartSimulation()
+    public void MarchingCubes()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("TerrainGeneration");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("CubesScene");
+    }
+
+    public void HeightMapper()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("HeightMapper");
     }
 }
