@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//Written By: Tony D'Alesandro
+/* 
+ * Written By: Tony D'Alesandro
+ */
 public class BoidVision
 {
     private Vector3 center;

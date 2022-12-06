@@ -16,7 +16,6 @@ namespace TerrainGeneration.Version3
         [SerializeField] private float delay;
 
         private ITerrainAlgorithm algorithm;
-        private Dictionary<Vector3Int, GameObject> gameObjects;
 
         public void Start()
         {
@@ -24,7 +23,7 @@ namespace TerrainGeneration.Version3
             {
                 case Algorithm.HeightMapper:
                     var map = new HeightMapper(settings);
-                    map.OnGenerationComplete += TranslateMeshesDown;
+                    map.OnGenerationComplete += HeightMapColor;
                     map.OnGenerationComplete += DrawCubes;
                     algorithm = map;
                     break;
@@ -36,8 +35,20 @@ namespace TerrainGeneration.Version3
             }
             StartCoroutine(GenerateTerrain());
         }
-        private void TranslateMeshesDown()
+        private void HeightMapColor()
         {
+            HeightMapper mapper = (HeightMapper)algorithm;
+            for(int i = 0; i < meshParent.childCount; i++)
+            {
+                var child = meshParent.GetChild(i);
+                Mesh mesh = child.GetComponent<MeshFilter>().mesh;
+                IMeshColorer colorer = new HeightMeshColorer(
+                    mesh,
+                    settings.ColorGradient, (mapper.minimumPoint,
+                    mapper.maximumPoint));
+                mesh.Optimize();
+                colorer.Color();
+            }
         }
         private void DrawCubes()
         {

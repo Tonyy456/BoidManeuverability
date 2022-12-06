@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace TerrainGeneration.Version3
 {
+    /*
+     * Author Anthony D'Alesandro
+     */
     public class HeightMapper : ITerrainAlgorithm
     {
         private GenerationSettings settings;
@@ -70,9 +73,9 @@ namespace TerrainGeneration.Version3
 
             PostMeshCreation(mesh, collider);
 
-            if (signal && OnGenerationComplete != null) OnGenerationComplete();
 
             filter.mesh = mesh;
+            if (signal && OnGenerationComplete != null) OnGenerationComplete();
             yield return null;
         }
 
@@ -83,10 +86,7 @@ namespace TerrainGeneration.Version3
             mesh.RecalculateNormals();
             mesh.Optimize();
 
-            IMeshColorer colorer = new HeightMeshColorer(mesh, settings.ColorGradient);
-
             collider.sharedMesh = mesh;
-            colorer.Color();
         }
 
         private Vector3[] addNoise(Vector3[] points)
