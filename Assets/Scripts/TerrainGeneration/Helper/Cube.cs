@@ -34,6 +34,9 @@ using UnityEngine;
  *  Cube defines a cube at its center with a specific height.
  *  Vertices and edges are returned in an array in the above manner.
  */
+/* 
+ * Written By: Tony D'Alesandro
+ */
 public struct Cube
 {
     public Vector3 center;

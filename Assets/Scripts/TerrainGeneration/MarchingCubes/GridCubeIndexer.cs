@@ -5,6 +5,9 @@
  * a 3d array of points equally seperated forms smaller cubes.
  * Cube(0,0,0) starts at the most negative coordinates.
  */
+ /* 
+  * Written By: Tony D'Alesandro
+  */
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;

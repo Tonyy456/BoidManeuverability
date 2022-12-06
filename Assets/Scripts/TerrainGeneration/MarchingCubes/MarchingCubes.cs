@@ -6,6 +6,9 @@ using TerrainGeneration.Version3;
 /*
  * Unity script that executes the marching cubes algorithm
  */
+ /* 
+  * Written By: Tony D'Alesandro
+  */
 public class MarchingCubes : ITerrainAlgorithm
 {
     private GenerationSettings settings;

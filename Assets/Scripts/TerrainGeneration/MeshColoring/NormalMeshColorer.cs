@@ -5,6 +5,9 @@ using UnityEngine;
  * evaluates the angle between the normal and Vector3.up on the interval
  * [0,180] and maps it to [0,1] and evaluates it on the gradient.
  */
+ /* 
+  * Written By: Tony D'Alesandro
+  */
 public class NormalMeshColorer : IMeshColorer
 {
     private Mesh mesh;

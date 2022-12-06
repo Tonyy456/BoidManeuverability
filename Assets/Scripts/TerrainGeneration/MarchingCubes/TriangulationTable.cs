@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+ /* 
+  * Written By: Tony D'Alesandro
+  */
 public class TriangulationTable : MonoBehaviour
 {
     // Values from http://paulbourke.net/geometry/polygonise/

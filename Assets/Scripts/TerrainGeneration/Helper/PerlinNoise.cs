@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/* 
+ * Written By: Tony D'Alesandro
+ */
 public class PerlinNoise
 {
     public static float Noise2D(Vector3 point, float frequency, float seed)

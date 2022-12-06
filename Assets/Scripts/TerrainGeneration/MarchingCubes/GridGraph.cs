@@ -13,6 +13,9 @@ using UnityEngine.UIElements;
  * meshVertices is used for creating a mesh so you know exactly what index
  * to map a triangle edge to.
  */
+ /* 
+  * Written By: Tony D'Alesandro
+  */
 public class GridGraph
 {
 

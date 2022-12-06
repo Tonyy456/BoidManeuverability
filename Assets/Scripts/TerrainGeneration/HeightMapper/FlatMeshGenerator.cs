@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+/* 
+ * Written By: Tony D'Alesandro
+ */
 public class FlatMeshGenerator
 {
     private Vector3 center;

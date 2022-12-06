@@ -6,6 +6,9 @@ using UnityEngine;
  * Only purpose is to take all the vertices and edge for a cube and 
  * return the triangles that should be created for the mesh.
  */
+ /* 
+  * Written By: Tony D'Alesandro
+  */
 public class MCCube
 {
     public Vector3[] vertices { get; set; }
